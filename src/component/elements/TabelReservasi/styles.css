@@ -1,0 +1,31 @@
+.odd-row {
+  background-color: #fcfcfc !important; /* Warna gelap untuk baris ganjil */
+}
+
+.even-row {
+  background-color: #edf2f7 !important; /* Warna putih untuk baris genap */
+}
+
+td.ant-table-cell.ant-table-cell-fix-left {
+  background-color: inherit !important; /* Warna mengikuti baris */
+}
+
+td.ant-table-cell.ant-table-column-sort {
+  background-color: inherit !important; /* Pastikan warna mengikuti baris */
+}
+
+tr.ant-table-row:hover {
+  background-color: #ced2d7 !important;
+}
+
+
+/* .ant-table-cell-fix-left:nth-child(even) {
+  background-color: #333;
+  color: white;
+}
+
+.ant-table-cell-fix-left:nth-child(odd) {
+  background-color: white;
+  color: #333;
+} */
+

@@ -1,0 +1,34 @@
+[data-slot="tabWrapper"] [data-slot="panel"] {
+    width: 75% !important;
+}
+
+[data-slot="tabWrapper"] [data-slot="base"] {
+    width: 25% !important;
+}
+
+[data-slot="tabWrapper"] [data-slot="base"] [data-slot="tabList"] {
+    width: 100% !important;
+}
+
+.chakra-stack [data-slot="base"] {
+    width: 100% !important;
+}
+
+[aria-selected="true"] [data-slot="cursor"] {
+    background-color: #002b6a !important; 
+}
+
+/* [aria-selected="false"] [data-slot="cursor"] {
+    background-color: #9C9898 !important; 
+} */
+
+[aria-selected="false"]  [data-slot="tabContent"] {
+    color: #000000 !important;
+}
+
+[data-slot="tabContent"] {
+    color: #f0f0f0 !important;
+}
+
+
+  

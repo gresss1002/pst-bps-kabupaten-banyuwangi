@@ -1,0 +1,11 @@
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #002b6a !important;  /* Change text color */
+}
+
+.ant-tabs-ink-bar {
+    background-color: #002b6a !important;  /* Change underline color */
+}
+
+.ant-tabs-tab:hover .ant-tabs-tab-btn {
+    color: #073B87 !important;  /* Hover text color */
+}
