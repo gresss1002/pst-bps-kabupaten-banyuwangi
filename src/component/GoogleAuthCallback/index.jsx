@@ -7,11 +7,10 @@ const GoogleAuthCallback = () => {
         axiosInstance.get('/auth/google/callback')
             .then(response => {
                 const data = response.data;
-                
-                // Logging data untuk debugging
-                console.log('API Response:', data);  // Periksa apakah role dikirim dengan benar
 
-                // Cek jika semua data yang dibutuhkan ada
+                // Logging data untuk debugging
+                console.log('API Response:', data);  // Pastikan role dikirim dengan benar
+
                 if (data.googleId && data.email && data.name) {
                     // Simpan data pengguna ke localStorage
                     localStorage.setItem('googleId', data.googleId);
@@ -21,6 +20,9 @@ const GoogleAuthCallback = () => {
                     // Jika role tidak ada, set ke "Konsumen" secara default
                     const role = data.role || 'Konsumen';
                     localStorage.setItem('role', role);
+
+                    // Verifikasi apakah role tersimpan dengan benar di localStorage
+                    console.log('Stored role in localStorage:', localStorage.getItem('role'));
 
                     console.log('Login successful with role:', role);
 
