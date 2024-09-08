@@ -7,21 +7,29 @@ const GoogleAuthCallback = () => {
         axiosInstance.get('/auth/google/callback')
             .then(response => {
                 const data = response.data;
-                if (data.googleId && data.email && data.name && data.role) {
+                
+                // Logging data untuk debugging
+                console.log('API Response:', data);  // Periksa apakah role dikirim dengan benar
+
+                // Cek jika semua data yang dibutuhkan ada
+                if (data.googleId && data.email && data.name) {
                     // Simpan data pengguna ke localStorage
                     localStorage.setItem('googleId', data.googleId);
                     localStorage.setItem('email', data.email);
                     localStorage.setItem('name', data.name);
-                    localStorage.setItem('role', data.role);
+                    
+                    // Jika role tidak ada, set ke "Konsumen" secara default
+                    const role = data.role || 'Konsumen';
+                    localStorage.setItem('role', role);
 
-                    console.log('Login successful:', data);
+                    console.log('Login successful with role:', role);
 
                     // Redirect berdasarkan role pengguna
-                    if (data.role === 'Konsumen') {
+                    if (role === 'Konsumen') {
                         window.location.href = '/konsumen';
-                    } else if (data.role === 'Konsultan') {
+                    } else if (role === 'Konsultan') {
                         window.location.href = '/konsultan';
-                    } else if (data.role === 'Admin') {
+                    } else if (role === 'Admin') {
                         window.location.href = '/admin';
                     } else {
                         console.error('Invalid role');
