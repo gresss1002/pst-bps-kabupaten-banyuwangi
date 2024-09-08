@@ -1,10 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Button, Stack } from "@chakra-ui/react";
 import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload } from 'antd';
 import { district, education, gender, work, subsdistrict } from "../../../data";
+import formatDate from "../../../utils/formatedDate";
+import axiosInstance from "../../../utils/axiosInstance";
+import convertToISODate from "../../../utils/convertToISODate";
 
 // Fungsi untuk mendapatkan Base64 dari file
 const getBase64 = (file) =>
@@ -15,7 +18,7 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-const UserFormProfile = () => {
+const UserFormProfile = ({ userData }) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
@@ -30,6 +33,23 @@ const UserFormProfile = () => {
     const [birthDate, setBirthDate] = useState(null);
     const [telephone, setTelephone] = useState('');
     const [subsdistrictsTouched, setSubsdistrictsTouched] = useState(false);
+
+    useEffect(() => {
+        if (userData !== null) {
+            setName(userData?.name || '');
+            setEmail(userData?.email || '');
+            setGender(userData?.gender || '');
+            setDistricts(userData?.district || '');
+            setSubsdistricts(userData?.subsdistrict || '');
+            if (userData.district !== "") {
+                setSubsdistrictsTouched(true);
+            }
+            setWork(userData?.work || '');
+            setPendidikan(userData?.education || '');
+            setBirthDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
+            setTelephone(userData?.telephone || '');
+        }
+    }, [userData]);
 
     // Fungsi untuk menangani preview gambar
     const handlePreview = async (file) => {
@@ -128,8 +148,25 @@ const UserFormProfile = () => {
         } else {
             setSubsdistrictsFiltered([]);
         }
-        setSubsdistricts(""); 
+        setSubsdistricts("");
     }, [districts]);
+
+    // useEffect(() => {
+    //     console.log('Districts:', districts);
+    //     console.log('Subsdistricts:', subsdistricts);
+    //     console.log('Subsdistricts Filtered:', subsdistrictsFiltered);
+
+    //     const selectedDistrict = district.find(d => d.value === districts);
+    //     if (selectedDistrict) {
+    //         const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
+    //         setSubsdistrictsFiltered(filtered);
+    //     } else {
+    //         setSubsdistrictsFiltered([]);
+    //     }
+    //     // Optionally reset subsdistricts if needed
+    //     // setSubsdistricts("");
+    // }, [districts]);
+
 
     const handleDistrictsChange = (value) => {
         setDistricts(value);
@@ -138,6 +175,33 @@ const UserFormProfile = () => {
     const handleSubsdistrictsClick = () => {
         setSubsdistrictsTouched(true); // Track interaction with Subsdistricts dropdown
     };
+
+    const handlePerbaruiButtonClick = () => {
+        const updatedUserData = {
+            name: name,
+            email: email,
+            gender: genders,
+            district: districts,
+            subsdistrict: subsdistricts,
+            work: works,
+            education: educations,
+            birthDate: formatDate(birthDate),
+            telephone: telephone
+        };
+
+        console.log("Updated User Data:", updatedUserData);
+
+        updateUserData(updatedUserData);
+    }
+
+    const updateUserData = async (updatedUserData) => {
+        try {
+            const response = await axiosInstance.patch(`/users/${userData._id}`, updatedUserData);
+            console.log("User data updated successfully:", response.data);
+        } catch (error) {
+            console.error("Error updating user data:", error);
+        }
+    }
 
     const isButtonDisabled = useMemo(() => {
         return (
@@ -152,6 +216,23 @@ const UserFormProfile = () => {
             educationStatus === "nonActive" || educationStatus === "danger"
         );
     }, [genderStatus, birthDateStatus, telephoneStatus, districtsStatus, subsdistrictsStatus, workStatus, educationStatus]);
+
+
+    useEffect(() => {
+        console.log('Districts:', districts);
+        console.log('Subsdistricts:', subsdistricts);
+        console.log('Subsdistricts Filtered:', subsdistrictsFiltered);
+
+        const selectedDistrict = district.find(d => d.value === districts);
+        if (selectedDistrict) {
+            const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
+            setSubsdistrictsFiltered(filtered);
+        } else {
+            setSubsdistrictsFiltered([]);
+        }
+        // Optionally reset subsdistricts if needed
+        // setSubsdistricts("");
+    }, [districts]);
 
     return (
         <div className="flex min-h-screen my-4 mx-2">
@@ -214,6 +295,7 @@ const UserFormProfile = () => {
                             variant="bordered"
                             isInvalid={genderStatus === "danger"}
                             color={genderStatus}
+                            selectedKeys={[genders]}
                             errorMessage={genderStatus === "danger" ? "Pilih Jenis Kelamin" : ""}
                             onChange={(e) => setGender(e.target.value)}
                             isRequired
@@ -257,6 +339,7 @@ const UserFormProfile = () => {
                             variant="bordered"
                             isInvalid={districtsStatus === "danger"}
                             color={districtsStatus}
+                            selectedKeys={[districts]}
                             errorMessage={districtsStatus === "danger" ? "Pilih Kabupaten/Kota" : ""}
                             onChange={(e) => handleDistrictsChange(e.target.value)}
                             isRequired
@@ -272,12 +355,14 @@ const UserFormProfile = () => {
                             label="Asal Desa"
                             className="w-full"
                             variant="bordered"
+                            selectedKeys={[subsdistricts]}
                             isInvalid={subsdistrictsStatus === "danger"}
                             color={subsdistrictsStatus}
                             errorMessage={subsdistrictsStatus === "danger" ? "Pilih Kecamatan telebih dahulu" : ""}
-                            onChange={(value) => setSubsdistricts(value)}
+                            // onChange={(value) => setSubsdistricts(value)}
+                            onChange={(e) => setSubsdistricts(e.target.value)}
                             onClick={handleSubsdistrictsClick}
-                            value={subsdistricts}
+                            // value={subsdistricts}
                             isRequired
                         >
                             {subsdistrictsFiltered.map((sd) => (
@@ -293,6 +378,7 @@ const UserFormProfile = () => {
                             variant="bordered"
                             isInvalid={workStatus === "danger"}
                             color={workStatus}
+                            selectedKeys={[works]}
                             errorMessage={workStatus === "danger" ? "Pilih Pekerjaan" : ""}
                             onChange={(e) => setWork(e.target.value)}
                             isRequired
@@ -310,6 +396,7 @@ const UserFormProfile = () => {
                             variant="bordered"
                             isInvalid={educationStatus === "danger"}
                             color={educationStatus}
+                            selectedKeys={[educations]}
                             errorMessage={educationStatus === "danger" ? "Pilih Pendidikan Terakhir" : ""}
                             onChange={(e) => setPendidikan(e.target.value)}
                             isRequired
@@ -322,7 +409,7 @@ const UserFormProfile = () => {
                         </Select>
 
                         <div className="flex flex-col justify-center items-center h-[60px] text-[14px] gap-1 mt-2">
-                            <Button variant='ghost' colorScheme='bluePrimary' className="text-nonActive border-2 hover:bg-bluePrimary hover:text-white gap-2" style={{ borderRadius: "20px", width: '110px' }} isDisabled={isButtonDisabled}>
+                            <Button variant='ghost' colorScheme='bluePrimary' className="text-nonActive border-2 hover:bg-bluePrimary hover:text-white gap-2" style={{ borderRadius: "20px", width: '110px' }} isDisabled={isButtonDisabled} onClick={handlePerbaruiButtonClick}>
                                 Perbaharui
                             </Button>
                         </div>

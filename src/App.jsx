@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NextUIProvider } from '@nextui-org/react';
 import { Route, Routes } from 'react-router-dom';
 import HeaderNavbar from './component/layout/HeaderNavbar';
@@ -13,9 +13,29 @@ import KonsultanPages from './pages/KonsultanPages';
 import AdminPages from './pages/AdminPages';
 import { FloatButton } from 'antd';
 import { FaArrowUp } from 'react-icons/fa';
+import GoogleAuthCallback from './component/GoogleAuthCallback';
+import Welcome from './component/Welcome';
+import axiosInstance from './utils/axiosInstance';
 
 function App() {
   const [activeSection, setActiveSection] = useState(window.location.hash || '#beranda');
+  const userLocal = JSON.parse(localStorage.getItem('user'));
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+     // Memanggil fetchUserData
+     const fetchUserData = async () => {
+      try {
+        const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+        setUserData(response.data.user);
+        console.log('User data:', response.data.user);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <NextUIProvider>
@@ -34,24 +54,24 @@ function App() {
         />
         <Route path="/konsumen" element={
           <>
-            <DoneLoginHeaderNavbar />
-            <UserPages />
+            <DoneLoginHeaderNavbar userData={userData} />
+            <UserPages userData={userData} />
             <Footer />
             <FloatButton.BackTop icon={<FaArrowUp className='text-blueSecondary'/>}/>
           </>
         } />
         <Route path="/konsultan" element={
           <>
-            <DoneLoginHeaderNavbar />
-            <KonsultanPages />
+            <DoneLoginHeaderNavbar userData={userData}/>
+            <KonsultanPages userData={userData}/>
             <Footer />
             <FloatButton.BackTop icon={<FaArrowUp className='text-blueSecondary'/>}/>
           </>
         } />
         <Route path="/admin" element={
           <>
-            <DoneLoginHeaderNavbar />
-            <AdminPages />
+            <DoneLoginHeaderNavbar userData={userData}/>
+            <AdminPages userData={userData}/>
             <Footer />
             <FloatButton.BackTop icon={<FaArrowUp className='text-blueSecondary'/>}/>
           </>
@@ -64,6 +84,8 @@ function App() {
             <FloatButton.BackTop icon={<FaArrowUp className='text-blueSecondary'/>}/>
           </>
         } />
+        <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+        <Route path="/welcome" element={<Welcome />} />
         {/* <Route path="/login" element={
           <>
             <LoginHeaderNavbar />

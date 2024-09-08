@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, User } from "@nextui-org/react";
+import axiosInstance from '../../../utils/axiosInstance';
 
-const DoneLoginHeaderNavbar = () => {
+const DoneLoginHeaderNavbar = ({ userData }) => {
   const [activeSection, setActiveSection] = useState(window.location.hash || '#beranda');
+
 
   useEffect(() => {
     const handleHashChange = () => {
       setActiveSection(window.location.hash);
     };
 
-    window.addEventListener('hashchange', handleHashChange);
+    // Menambahkan event listener
+    window.addEventListener('hashchange', handleHashChange)
 
+    // Membersihkan event listener saat komponen di-unmount
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
@@ -61,18 +65,20 @@ const DoneLoginHeaderNavbar = () => {
       </NavbarContent>
       <NavbarContent justify='end'>
         <NavbarItem>
-          <User
-            className='font-inter'
-            name={(<p className='text-[14px] font-bold'>
-              Sarah
-            </p>)}
-            description={(<p className='text-[10px] text-bluePrimary'>
-              Admin
-            </p>)}
-            avatarProps={{
-              src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
-            }}
-          />
+          {userData != null && (
+            <User
+              className='font-inter'
+              name={(<p className='text-[14px] font-bold'>
+                {userData?.name}
+              </p>)}
+              description={(<p className='text-[10px] text-bluePrimary'>
+                {userData?.role}
+              </p>)}
+              avatarProps={{
+                src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
+              }}
+            />
+          )}
         </NavbarItem>
       </NavbarContent>
     </Navbar>
