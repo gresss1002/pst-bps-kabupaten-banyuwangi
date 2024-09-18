@@ -153,7 +153,7 @@ const AdminFormProfile = () => {
                 <Stack>
                     <div className="flex flex-col gap-3 justify-center items-center">
                         <Upload
-                            action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                            action="https://backend-pst.vercel.app/upload"
                             listType="picture-circle"
                             onPreview={handlePreview}
                             onChange={handleChange}
