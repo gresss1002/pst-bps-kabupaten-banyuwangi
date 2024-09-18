@@ -3,11 +3,12 @@ import { Button, Stack } from "@chakra-ui/react";
 import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, Upload } from 'antd';
+import { Image, message, Upload } from 'antd';
 import { district, education, gender, work, subsdistrict } from "../../../data";
 import formatDate from "../../../utils/formatedDate";
 import axiosInstance from "../../../utils/axiosInstance";
 import convertToISODate from "../../../utils/convertToISODate";
+import axios from "axios";
 
 // Fungsi untuk mendapatkan Base64 dari file
 const getBase64 = (file) =>
@@ -56,6 +57,8 @@ const UserFormProfile = () => {
     const [birthDate, setBirthDate] = useState(null);
     const [telephone, setTelephone] = useState('');
     const [subsdistrictsTouched, setSubsdistrictsTouched] = useState(false);
+    const [photoLink, setPhotoLink] = useState('');
+    
 
     useEffect(() => {
         if (userData !== null) {
@@ -71,6 +74,7 @@ const UserFormProfile = () => {
             setPendidikan(userData?.education || '');
             setBirthDate(userData?.birthDate ? parseDate(convertToISODate(formatDate(userData.birthDate))) : null);
             setTelephone(userData?.telephone || '');
+            setPhotoLink(userData?.photoLink || '');
         }
     }, [userData]);
 
@@ -85,6 +89,33 @@ const UserFormProfile = () => {
 
     // Fungsi untuk menangani perubahan file upload
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+      // Custom request untuk upload gambar dan simpan URL ke photoLink
+  const handleCustomRequest = async ({ file, onSuccess, onError }) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post('https://backend-pst.vercel.app/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data && response.data.url) {
+        // Simpan URL gambar di photoLink
+        setPhotoLink(response.data.url);
+        message.success('Upload successful!');
+        onSuccess(response.data);
+      } else {
+        message.error('Upload failed!');
+        onError('No URL in response');
+      }
+    } catch (error) {
+      message.error('Error uploading file');
+      onError(error);
+    }
+  };
 
     // Tombol upload gambar
     const uploadButton = (
@@ -193,7 +224,8 @@ const UserFormProfile = () => {
             work: works,
             education: educations,
             birthDate: formatDate(birthDate),
-            telephone: telephone
+            telephone: telephone,
+            photoLink: photoLink
         };
 
         console.log("Updated User Data:", updatedUserData);
@@ -247,8 +279,9 @@ const UserFormProfile = () => {
                 <Stack>
                     <div className="flex flex-col gap-3 justify-center items-center">
                         <Upload
-                            action="https://backend-pst.vercel.app/upload"
+                            customRequest={handleCustomRequest}
                             listType="picture-circle"
+                            fileList={fileList}
                             onPreview={handlePreview}
                             onChange={handleChange}
                         >
@@ -256,9 +289,7 @@ const UserFormProfile = () => {
                         </Upload>
                         {previewImage && (
                             <Image
-                                wrapperStyle={{
-                                    display: 'none',
-                                }}
+                                wrapperStyle={{ display: 'none' }}
                                 preview={{
                                     visible: previewOpen,
                                     onVisibleChange: (visible) => setPreviewOpen(visible),
@@ -267,6 +298,8 @@ const UserFormProfile = () => {
                                 src={previewImage}
                             />
                         )}
+                        {/* Display the photoLink URL */}
+                        {photoLink && <p>Photo URL: {photoLink}</p>}
 
                         <Input
                             value={name}
