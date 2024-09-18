@@ -63,7 +63,6 @@ function App() {
 
   return (
     <NextUIProvider>
-      {/* <BrowserRouter> */}
       <Routes>
 
         <Route
