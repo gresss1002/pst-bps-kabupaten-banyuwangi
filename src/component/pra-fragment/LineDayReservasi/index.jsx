@@ -2,12 +2,15 @@
 import React from 'react';
 import LineChart from '../../elements/LineChart';
 import { reservasi } from '../../../data'; // Data import sesuai konteks Anda
+import dayjs from 'dayjs'; // Gunakan dayjs untuk manipulasi tanggal
 
 // Fungsi untuk memproses data menjadi jumlah reservasi per hari
 const processReservasiData = (data) => {
   // Hitung jumlah reservasi per hari
   const counts = data.reduce((acc, curr) => {
-    const date = curr.date; // Misalkan setiap reservasi memiliki properti 'date'
+    // Konversi reservasiDate ke format 'YYYY-MM-DD'
+    const date = dayjs(curr.reservasiDate).format('YYYY-MM-DD');
+    
     if (acc[date]) {
       acc[date] += 1;
     } else {
@@ -17,8 +20,8 @@ const processReservasiData = (data) => {
   }, {});
 
   // Ubah objek counts menjadi format yang diinginkan untuk chart
-  const categories = Object.keys(counts);
-  const values = Object.values(counts);
+  const categories = Object.keys(counts); // Tanggal-tanggal unik
+  const values = Object.values(counts); // Jumlah reservasi per tanggal
 
   // Format data untuk chart line, series harus berupa array objek
   const series = [
@@ -38,7 +41,7 @@ const LineDayReservasi = () => {
   return (
     <div>
       <LineChart
-        data={processedData}
+        data={processedData.series}
         title="Jumlah Reservasi per Hari"
         colors={['#68b92e']} // Warna garis chart di sini bisa diganti sesuai keinginan
         categories={processedData.categories}
