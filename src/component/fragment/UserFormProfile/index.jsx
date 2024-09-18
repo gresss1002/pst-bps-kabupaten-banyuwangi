@@ -58,7 +58,7 @@ const UserFormProfile = () => {
     const [telephone, setTelephone] = useState('');
     const [subsdistrictsTouched, setSubsdistrictsTouched] = useState(false);
     const [photoLink, setPhotoLink] = useState('');
-    
+
 
     useEffect(() => {
         if (userData !== null) {
@@ -90,32 +90,33 @@ const UserFormProfile = () => {
     // Fungsi untuk menangani perubahan file upload
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
-      // Custom request untuk upload gambar dan simpan URL ke photoLink
-  const handleCustomRequest = async ({ file, onSuccess, onError }) => {
-    const formData = new FormData();
-    formData.append('file', file);
+    // Custom request untuk upload gambar dan simpan URL ke photoLink
+    const handleCustomRequest = async ({ file, onSuccess, onError }) => {
+        const formData = new FormData();
+        formData.append('file', file);
 
-    try {
-      const response = await axios.post('https://backend-pst.vercel.app/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+        try {
+            const response = await axios.post('https://backend-pst.vercel.app/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
-      if (response.data && response.data.url) {
-        // Simpan URL gambar di photoLink
-        setPhotoLink(response.data.url);
-        message.success('Upload successful!');
-        onSuccess(response.data);
-      } else {
-        message.error('Upload failed!');
-        onError('No URL in response');
-      }
-    } catch (error) {
-      message.error('Error uploading file');
-      onError(error);
-    }
-  };
+            if (response.data && response.data.url) {
+                // Simpan URL gambar di photoLink
+                setPhotoLink(response.data.url);
+                message.success('Upload successful!');
+                onSuccess(response.data);
+            } else {
+                message.error('Upload failed!');
+                onError('No URL in response');
+            }
+        } catch (error) {
+            message.error('Error uploading file');
+            onError(error);
+        }
+    };
+
 
     // Tombol upload gambar
     const uploadButton = (
@@ -287,6 +288,7 @@ const UserFormProfile = () => {
                         >
                             {fileList.length >= 1 ? null : uploadButton}
                         </Upload>
+
                         {previewImage && (
                             <Image
                                 wrapperStyle={{ display: 'none' }}
