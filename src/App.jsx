@@ -110,41 +110,7 @@ function App() {
         } />
         <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
         <Route path="/welcome" element={<Welcome fetchUserData={fetchUserData} />} />
-        {/* <Route path="/login" element={
-          <>
-            <LoginHeaderNavbar />
-            <Login />
-            <Footer />
-          </>
-        } />
-        <Route path="/register" element={
-          <>
-            <LoginHeaderNavbar />
-            <Register />
-            <Footer />
-          </>
-        } />
-        <Route path="/user" element={
-          <>
-            <DoneLoginHeaderNavbar />
-            <UserLayanan />
-            <Footer />
-          </>
-        } />
-        <Route path="/konsultan" element={
-          <>
-            <DoneLoginHeaderNavbar />
-            <KosultanLayanan />
-            <Footer />
-          </>
-        } />
-        <Route path="/admin" element={
-          <>
-            <DoneLoginHeaderNavbar />
-            <AdminLayanan />
-            <Footer />
-          </>
-        } /> */}
+ 
       </Routes>
       {/* </BrowserRouter> */}
     </NextUIProvider>
