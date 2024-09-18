@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardBody } from "@chakra-ui/react";
 import FormatNotifikasi from "../../elements/FormatNotifikasi";
 import AdminModalNotifikasi from "../../pra-fragment/AdminModalNotifikasi";
-import axios from "axios";
-import axiosInstance from "../../../utils/axiosInstance";
+import axiosInstance from "../../../utils/axiosInstance"; // Remove unused import 'axios'
 
 const AdminNotifikasi = () => {
     const [reservasi, setReservasi] = useState([]);
@@ -40,25 +39,31 @@ const AdminNotifikasi = () => {
             {reservasi.length === 0 ? (
                 <p>No reservations found.</p>
             ) : (
-                reservasi.map(rsv => (
-                    <Card
-                        key={rsv._id} // Use _id or another unique identifier from the reservation data
-                        style={{
-                            border: "1px solid #f0f0f0",
-                            borderRadius: "15px",
-                            width: "100%",
-                            backgroundColor: rsv.status === 'Disetujui' ? '#68b92e' : '#ea8b1c'
-                        }}
-                        onClick={() => handleEditClick(rsv)}
-                    >
-                        <CardBody>
-                            <FormatNotifikasi 
-                                reservasi={rsv} 
-                                ModalNotifkasiComponent={AdminModalNotifikasi} 
-                            />
-                        </CardBody>
-                    </Card>
-                ))
+                reservasi
+                    .filter(rsv => 
+                        rsv.status === 'Disetujui' || 
+                        rsv.status === 'Diubah Admin' || 
+                        rsv.status === 'Diubah Konsultan'
+                    )
+                    .map(rsv => (
+                        <Card
+                            key={rsv._id} // Use _id or another unique identifier from the reservation data
+                            style={{
+                                border: "1px solid #f0f0f0",
+                                borderRadius: "15px",
+                                width: "100%",
+                                backgroundColor: rsv.status === 'Disetujui' ? '#68b92e' : '#ea8b1c'
+                            }}
+                            onClick={() => handleEditClick(rsv)}
+                        >
+                            <CardBody>
+                                <FormatNotifikasi 
+                                    reservasi={rsv} 
+                                    ModalNotifkasiComponent={AdminModalNotifikasi} 
+                                />
+                            </CardBody>
+                        </Card>
+                    ))
             )}
         </div>
     );
