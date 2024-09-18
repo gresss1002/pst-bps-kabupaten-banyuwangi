@@ -75,6 +75,12 @@ const UserFormProfile = () => {
             setBirthDate(userData?.birthDate ? parseDate(convertToISODate(formatDate(userData.birthDate))) : null);
             setTelephone(userData?.telephone || '');
             setPhotoLink(userData?.photoLink || '');
+            setFileList(userData?.photoLink ? [{
+                uid: userData?._id,
+                name: userData?.name,
+                status: 'done',
+                url: userData?.photoLink,
+              },] : []);
         }
     }, [userData]);
 
