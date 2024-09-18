@@ -1,18 +1,8 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useMemo, useEffect } from "react";
-import { Button, Card, CardBody, Stack } from "@chakra-ui/react";
-import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
-import { today, getLocalTimeZone, parseDate, isWeekend } from "@internationalized/date";
-import { useLocale } from "@react-aria/i18n";
+import { Button, useDisclosure } from "@chakra-ui/react";
+import { Input, Select, SelectItem } from "@nextui-org/react";
+import axiosInstance from "../../../utils/axiosInstance";
 import { role } from "../../../data";
-// pastikan path ini benar sesuai struktur project Anda
-
-// const getInputStyle = (value) => {
-//   if (value === "") return "nonActive";
-//   if (/^[a-zA-Z\s]+$/.test(value)) return "success";
-//   if (/\d/.test(value)) return "danger";
-//   return "nonActive";
-// };
 
 const AdminModalTabelUsers = ({ users }) => {
   const [editUsersData, setEditUsersData] = useState({});
@@ -25,11 +15,16 @@ const AdminModalTabelUsers = ({ users }) => {
   const [workValue, setWorkValue] = useState("");
   const [educationValue, setEducationValue] = useState("");
   const [telephoneValue, setTeleponValue] = useState("");
+  const [moreDetails, setMoreDetails] = useState({});
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
 
   useEffect(() => {
     if (users) {
       setEditUsersData(users);
-      setSelectedRole(users.role);
+      setSelectedRole(users.role || "");
       setNameValue(users.name || "");
       setEmailValue(users.email || "");
       setGenderValue(users.gender || "");
@@ -38,20 +33,33 @@ const AdminModalTabelUsers = ({ users }) => {
       setWorkValue(users.work || "");
       setEducationValue(users.education || "");
       setTeleponValue(users.telephone || "");
+      fetchMoreDetails(users._id);
     }
   }, [users]);
 
-  const handleSelectChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "role") setSelectedRole(value);
+  const fetchMoreDetails = async (userId) => {
+    try {
+      const response = await axiosInstance.get(`/users/${userId}/details`);
+      setMoreDetails(response.data);
+    } catch (error) {
+      console.error('Error fetching additional user details:', error);
+    }
+  };
+
+  const handleSelectChange = (value) => {
+    setSelectedRole(value);
   };
 
   const handleInputChange = (setter) => (e) => {
     setter(e.target.value);
   };
 
-  const handleButtonClick = () => {
-    const data = {
+  const handleButtonClick = async () => {
+    if (!window.confirm("Apakah Anda yakin ingin mengubah role user ini?")) {
+      return;
+    }
+
+    const updatedUserData = {
       role: selectedRole,
       name: nameValue,
       email: emailValue,
@@ -62,11 +70,19 @@ const AdminModalTabelUsers = ({ users }) => {
       education: educationValue,
       telephone: telephoneValue,
     };
-    setEditUsersData(data);
-  };
 
-  let { locale } = useLocale();
-  const isDateUnavailable = (date) => isWeekend(date, locale);
+    try {
+      const response = await axiosInstance.patch(`/users/${users._id}`, updatedUserData);
+      console.log("User updated successfully:", response.data);
+      setEditUsersData(response.data);
+      setMessage("Pengubahan role user berhasil!");
+      setMessageType("success");
+    } catch (error) {
+      console.error("Error updating user:", error);
+      setMessage("Gagal mengubah role user. Silakan coba lagi.");
+      setMessageType("error");
+    }
+  };
 
   const roleStatus = useMemo(() => (selectedRole !== "" ? "success" : "nonActive"), [selectedRole]);
   const nameStatus = useMemo(() => (nameValue === "" ? "nonActive" : "success"), [nameValue]);
@@ -80,17 +96,17 @@ const AdminModalTabelUsers = ({ users }) => {
 
   const isButtonDisabled = useMemo(() => {
     return (
-      roleStatus === "nonActive" ||
-      nameStatus === "nonActive" ||
-      emailStatus === "nonActive" ||
-      genderStatus === "nonActive" ||
-      districtsStatus === "nonActive" ||
-      subsdistrictsStatus === "nonActive" ||
-      workStatus === "nonActive" ||
-      educationStatus === "nonActive" ||
-      telephoneStatus === "nonActive"
+      roleStatus === "danger" ||
+      nameStatus === "danger" ||
+      emailStatus === "danger" ||
+      genderStatus === "danger" ||
+      districtsStatus === "danger" ||
+      subsdistrictsStatus === "danger" ||
+      workStatus === "danger" ||
+      educationStatus === "danger" ||
+      telephoneStatus === "danger"
     );
-  }, [nameStatus, emailStatus, genderStatus, districtsStatus, subsdistrictsStatus, workStatus, educationStatus, telephoneStatus, roleStatus]);
+  }, [roleStatus, nameStatus, emailStatus, genderStatus, districtsStatus, subsdistrictsStatus, workStatus, educationStatus, telephoneStatus]);
 
   return (
     <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
@@ -121,6 +137,7 @@ const AdminModalTabelUsers = ({ users }) => {
           onChange={handleInputChange(setGenderValue)}
           color={genderStatus}
           isRequired
+          isReadOnly
         />
         <Input
           label="Asal Kecamatan"
@@ -130,6 +147,7 @@ const AdminModalTabelUsers = ({ users }) => {
           onChange={handleInputChange(setDistrictsValue)}
           color={districtsStatus}
           isRequired
+          isReadOnly
         />
         <Input
           label="Asal Desa"
@@ -139,6 +157,7 @@ const AdminModalTabelUsers = ({ users }) => {
           onChange={handleInputChange(setSubsdistrictsValue)}
           color={subsdistrictsStatus}
           isRequired
+          isReadOnly
         />
         <Input
           label="Pekerjaan"
@@ -148,6 +167,7 @@ const AdminModalTabelUsers = ({ users }) => {
           onChange={handleInputChange(setWorkValue)}
           color={workStatus}
           isRequired
+          isReadOnly
         />
         <Input
           label="Pendidikan Terakhir"
@@ -157,6 +177,7 @@ const AdminModalTabelUsers = ({ users }) => {
           onChange={handleInputChange(setEducationValue)}
           color={educationStatus}
           isRequired
+          isReadOnly
         />
         <Input
           label="Telepon"
@@ -166,24 +187,35 @@ const AdminModalTabelUsers = ({ users }) => {
           onChange={handleInputChange(setTeleponValue)}
           color={telephoneStatus}
           isRequired
+          isReadOnly
         />
         <Select
           label="Role"
           className="w-full"
           variant="bordered"
-          selectedKeys={selectedRole ? [selectedRole] : []}
-          onChange={handleSelectChange}
+          selectedKeys={[selectedRole]}
+          value={selectedRole}
+          onChange={(e) => handleSelectChange(e.target.value)}
           isRequired
-          name="role"
           color={roleStatus}
         >
           {role.map((m) => (
             <SelectItem key={m.value} value={m.value}>
-              {m.label}
+              {m.value}
             </SelectItem>
           ))}
         </Select>
       </div>
+
+      {/* Display additional user details */}
+      {Object.keys(moreDetails).length > 0 && (
+        <div className="w-full mx-[12%] mt-4 p-4 border border-gray-300 rounded-md">
+          <h3 className="font-bold text-lg">Additional Details</h3>
+          <p><strong>Address:</strong> {moreDetails.address || "N/A"}</p>
+          <p><strong>Joined:</strong> {moreDetails.joinedDate || "N/A"}</p>
+          {/* Add more fields as needed */}
+        </div>
+      )}
 
       <Button
         variant="ghost"
@@ -195,6 +227,13 @@ const AdminModalTabelUsers = ({ users }) => {
       >
         Perbaharui
       </Button>
+
+      {/* Notification Message */}
+      {message && (
+        <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+          <p>{message}</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -22,20 +22,44 @@ function App() {
   const userLocal = JSON.parse(localStorage.getItem('user'));
   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-     // Memanggil fetchUserData
-     const fetchUserData = async () => {
-      try {
-        const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
-        setUserData(response.data.user);
-        console.log('User data:', response.data.user);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
+  // useEffect(() => {
+  //    // Memanggil fetchUserData
+  //    const fetchUserData = async () => {
+  //     try {
+  //       const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+  //       setUserData(response.data.user);
+  //       console.log('User data:', response.data.user);
+  //     } catch (error) {
+  //       console.error('Error fetching user data:', error);
+  //     }
+  //   };
 
-    fetchUserData();
-  }, []);
+  //   fetchUserData();
+  // }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+      
+      // Extract the user data from the response
+      const userData = response.data.user;
+  
+      // Set the user data (assuming you have a state setter for this)
+      setUserData(userData);
+  
+      // Log user data for debugging purposes
+      console.log('User data:', userData);
+  
+      // Return the user data
+      return userData;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      
+      // Optionally, you could throw the error if you want the caller of this function to handle it
+      throw error;
+    }
+  };
+  
 
   return (
     <NextUIProvider>
@@ -54,8 +78,8 @@ function App() {
         />
         <Route path="/konsumen" element={
           <>
-            <DoneLoginHeaderNavbar userData={userData} />
-            <UserPages userData={userData} />
+            <DoneLoginHeaderNavbar  />
+            <UserPages/>
             <Footer />
             <FloatButton.BackTop icon={<FaArrowUp className='text-blueSecondary'/>}/>
           </>
@@ -85,7 +109,7 @@ function App() {
           </>
         } />
         <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
-        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/welcome" element={<Welcome fetchUserData={fetchUserData} />} />
         {/* <Route path="/login" element={
           <>
             <LoginHeaderNavbar />

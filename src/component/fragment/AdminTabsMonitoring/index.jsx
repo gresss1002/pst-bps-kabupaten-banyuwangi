@@ -15,8 +15,8 @@ const tabsMonitoring = [
         children: <div className="w-full">
             <BarSumReservasi />
             <BarSumTopik />
-            <LineDayReservasi />
             <DonutStatusReservasi />
+            <LineDayReservasi />
             <SlopeDaysTopik />
         </div>,
     },

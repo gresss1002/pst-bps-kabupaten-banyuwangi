@@ -1,34 +1,76 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { Button, Card, CardBody, Stack, useDisclosure } from "@chakra-ui/react";
 import { FaCheckCircle, FaToolbox } from "react-icons/fa";
-import { useState } from "react";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/react";
 import ContentTabs from "../../layout/ContentTabs";
 import ModalCardKonsultan from "../../pra-fragment/ModalCardKonsultan";
-import { user } from "../../../data";
 import { Rate } from "antd";
+import axiosInstance from '../../../utils/axiosInstance';
 
 const CardKonsultan = () => {
+    const [userData, setUserData] = useState(null);
+const userLocal = JSON.parse(localStorage.getItem('user'));
+
+
+useEffect(() => {
+    getUserData();
+}, []);
+
+const getUserData = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+      const userData = response.data.user;
+      console.log('User data:', response.data.user);
+      setUserData(userData);  
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedKonsultan, setSelectedKonsultan] = useState(null);
+    const [konsultanUsers, setKonsultanUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Filter users to get only those with the role 'konsultan'
-    const konsultanUsers = user.filter(user => user.role === "Konsultan");
+    useEffect(() => {
+        const fetchKonsultanUsers = async () => {
+            try {
+                const response = await axios.get('https://backend-pst.vercel.app/users/konsultan');
+                setKonsultanUsers(response.data);
+                setLoading(false);
+            } catch (error) {
+                setError(error.message);
+                setLoading(false);
+            }
+        };
+
+        fetchKonsultanUsers();
+    }, []);
 
     const handleButtonClick = (konsultan) => {
         setSelectedKonsultan(konsultan);
         onOpen();
     };
 
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
+    if (error) {
+        return <p>Error: {error}</p>;
+    }
+
     return (
         <>
             <ContentTabs title='Konsultan'>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-4 font-inter">
                     {konsultanUsers.map((konsultan) => (
-                        <Card key={konsultan.email} maxW='sm' style={{ border: "1px solid #f0f0f0", borderRadius: "20px" }} className="hover:bg-hoverActive">
+                        <Card key={konsultan._id} maxW='sm' style={{ border: "1px solid #f0f0f0", borderRadius: "20px" }} className="hover:bg-hoverActive">
                             <CardBody>
-                                {/* Assuming you have image URLs for konsultan */}
                                 <img
-                                    src={konsultan.image} // Add image URL in the user data if needed
+                                    src={konsultan.image}
                                     alt={konsultan.name}
                                     style={{ borderRadius: "18px", justifyItems: "center", alignItems: "center" }}
                                     className="w-full h-auto object-cover text-[12px] font-openSans"
@@ -40,15 +82,14 @@ const CardKonsultan = () => {
                                             <FaToolbox />{konsultan.position}
                                         </h1>
                                     </div>
-                                    <Rate allowHalf disabled value={konsultan.rating} className="flex justify-center"/>
+                                    <Rate allowHalf disabled value={konsultan.rating} className="flex justify-center" />
                                     <div className="flex flex-wrap gap-2 justify-center items-center overflow-x-hidden font-openSans">
-                                        {/* Use field as topic */}
                                         {konsultan.field && konsultan.field.map((topic, topicIndex) => (
                                             <div
                                                 key={topicIndex}
                                                 className="bg-gray-200 flex justify-center items-center rounded-xl shadow-md py-1 px-1 font-openSans text-[12px]"
                                             >
-                                                Survei {topic}
+                                               {topic}
                                             </div>
                                         ))}
                                     </div>
@@ -82,13 +123,17 @@ const CardKonsultan = () => {
                             Reservasi Konsultan {selectedKonsultan.name}
                         </ModalHeader>
                         <ModalBody className="mb-4">
-                            <ModalCardKonsultan konsultan={selectedKonsultan} />
+                            <ModalCardKonsultan
+                                konsultan={selectedKonsultan}
+                                idKonsultan={selectedKonsultan._id}
+                                idKonsumen={userData ? userData._id : null}
+                            />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
             )}
         </>
     );
-}
+};
 
 export default CardKonsultan;

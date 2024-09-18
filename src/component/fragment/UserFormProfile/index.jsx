@@ -18,7 +18,30 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-const UserFormProfile = ({ userData }) => {
+
+
+const UserFormProfile = () => {
+
+    const [userData, setUserData] = useState(null);
+    const userLocal = JSON.parse(localStorage.getItem('user'));
+
+
+    useEffect(() => {
+        getUserData();
+    }, []);
+
+    const getUserData = async () => {
+        try {
+            const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+            const userData = response.data.user;
+            console.log('User data:', response.data.user);
+            setUserData(userData);
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
+
+
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
@@ -46,7 +69,7 @@ const UserFormProfile = ({ userData }) => {
             }
             setWork(userData?.work || '');
             setPendidikan(userData?.education || '');
-            setBirthDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
+            setBirthDate(userData?.birthDate ? parseDate(convertToISODate(formatDate(userData.birthDate))) : null);
             setTelephone(userData?.telephone || '');
         }
     }, [userData]);
@@ -150,22 +173,6 @@ const UserFormProfile = ({ userData }) => {
         }
         setSubsdistricts("");
     }, [districts]);
-
-    // useEffect(() => {
-    //     console.log('Districts:', districts);
-    //     console.log('Subsdistricts:', subsdistricts);
-    //     console.log('Subsdistricts Filtered:', subsdistrictsFiltered);
-
-    //     const selectedDistrict = district.find(d => d.value === districts);
-    //     if (selectedDistrict) {
-    //         const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
-    //         setSubsdistrictsFiltered(filtered);
-    //     } else {
-    //         setSubsdistrictsFiltered([]);
-    //     }
-    //     // Optionally reset subsdistricts if needed
-    //     // setSubsdistricts("");
-    // }, [districts]);
 
 
     const handleDistrictsChange = (value) => {
@@ -320,19 +327,6 @@ const UserFormProfile = ({ userData }) => {
                             showMonthAndYearPickers
                         />
 
-                        <Input
-                            value={telephone}
-                            type="tel"
-                            label="Nomor Telepon"
-                            variant="bordered"
-                            isInvalid={telephoneStatus === "danger"}
-                            color={telephoneStatus}
-                            errorMessage={telephoneStatus === "danger" ? "Nomor Telepon harus berupa 08xxxxxxxxxx" : ""}
-                            onChange={(e) => setTelephone(e.target.value)}
-                            className="w-full"
-                            isRequired
-                        />
-
                         <Select
                             label="Asal Kecamatan"
                             className="w-full"
@@ -407,6 +401,19 @@ const UserFormProfile = ({ userData }) => {
                                 </SelectItem>
                             ))}
                         </Select>
+                        <Input
+                            value={telephone}
+                            type="tel"
+                            label="Nomor Telepon"
+                            variant="bordered"
+                            isInvalid={telephoneStatus === "danger"}
+                            color={telephoneStatus}
+                            errorMessage={telephoneStatus === "danger" ? "Nomor Telepon harus berupa 08xxxxxxxxxx" : ""}
+                            onChange={(e) => setTelephone(e.target.value)}
+                            className="w-full"
+                            isRequired
+                        />
+
 
                         <div className="flex flex-col justify-center items-center h-[60px] text-[14px] gap-1 mt-2">
                             <Button variant='ghost' colorScheme='bluePrimary' className="text-nonActive border-2 hover:bg-bluePrimary hover:text-white gap-2" style={{ borderRadius: "20px", width: '110px' }} isDisabled={isButtonDisabled} onClick={handlePerbaruiButtonClick}>

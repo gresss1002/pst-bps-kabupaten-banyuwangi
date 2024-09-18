@@ -14,7 +14,7 @@ const UserPages = ({ userData }) => {
             title: 'Profile Setting',
             subtitle: 'Lihat/Ubah Data Diri',
             description: 'Silahkan lengkapi data diri anda!',
-            content: <UserFormProfile userData={userData} />,
+            content: <UserFormProfile  />,
         },
         {
             key: 'reservasi',
@@ -34,7 +34,7 @@ const UserPages = ({ userData }) => {
             title: 'Riwayat Konsultasi',
             subtitle: 'Daftar Konsultasi',
             description: 'Anda dapat melihat daftar history konsultasi anda disini!',
-            content: <UserTabelReservasi />,
+            content: <UserTabelReservasi/>,
         },
         {
             key: 'notif',
@@ -43,13 +43,7 @@ const UserPages = ({ userData }) => {
             description: 'Anda dapat memantau pemberitahuan terbaru mengenai perubahan status reservasi disini',
             content:<UserNotifikasi/>
         },
-        {
-            key: 'aduan',
-            title: 'Pengaduan',
-            subtitle: 'Buat Pengaduan',
-            description: 'Anda dapat pengaduan berupa saran maupun keluhan terhadap pelayanan di BPS Kabupaten Banyuwangi',
-            content:<UserPengaduan/>
-        },
+     
     ];
 
     return (

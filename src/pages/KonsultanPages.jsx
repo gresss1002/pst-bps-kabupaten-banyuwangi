@@ -13,7 +13,7 @@ const KonsultanPages = ({ userData }) => {
             title: 'Profile Setting',
             subtitle: 'Lihat/Ubah Data Diri',
             description: 'Silahkan lengkapi data diri anda!',
-            content: <KonsultanFormProfile userData={userData} />,
+            content: <KonsultanFormProfile />,
         },
         {
             key: 'reservasi',

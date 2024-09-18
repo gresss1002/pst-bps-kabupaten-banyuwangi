@@ -1,11 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Button, Card, CardBody, Stack } from "@chakra-ui/react";
-import { DatePicker, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
+import { Button, DatePicker, Input, Select, SelectItem, Textarea, useDisclosure } from "@nextui-org/react";
 import { today, getLocalTimeZone, parseDate, isWeekend } from "@internationalized/date";
 import { useLocale } from "@react-aria/i18n";
-import { method, time, user } from "../../../data";
 import { Rate } from "antd";
+import axios from "axios";
+import formatDate from "../../../utils/formatedDate";
+import convertToISODate from "../../../utils/convertToISODate";
 import "./styles.css";
+import { method, time } from "../../../data";
+
 
 const getInputStyle = (value) => {
     if (value === "") return "nonActive";
@@ -19,107 +22,237 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
     const [selectedReservasiDate, setSelectedReservasiDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState("");
     const [selectedKonsultan, setSelectedKonsultan] = useState("");
+    const [konsultanUsers, setKonsultanUsers] = useState([]);
     const [konsumenValue, setKonsumenValue] = useState("");
     const [linkValue, setLinkValue] = useState("");
     const [topicValue, setTopicValue] = useState([]);
-    const [descriptionValue, setDescriptionValue] = useState(""); // Added state for description
-    const [rateValue, setRateValue] = useState(0); // Added state for rating
+    const [descriptionValue, setDescriptionValue] = useState("");
+    const [rateValue, setRateValue] = useState(0);
+    const [currentStatus, setCurrentStatus] = useState("");
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
+    const { onClose } = useDisclosure();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [genderValue, setGenderValue] = useState("");
+    const [userValue, setUserValue] = useState("");
+    const [isRatingDisabled, setIsRatingDisabled] = useState(false);
+    const isReadOnly = currentStatus !== "Menunggu Konfirmasi";
 
+    const idKonsumen = reservasi ? reservasi.idKonsumen : "";
+
+    // Fetch consumer details
+    useEffect(() => {
+        const fetchConsumerDetails = async () => {
+            if (!idKonsumen) return;
+            setLoading(true);
+            try {
+                const response = await axios.get('https://backend-pst.vercel.app/users/konsumen');
+                const konsumenUsers = response.data;
+                const consumer = konsumenUsers.find(user => user._id.toString() === idKonsumen);
+                if (consumer) {
+                    setUserValue(consumer.name);
+                    setGenderValue(consumer.gender);
+                } else {
+                    setError('User not found or not a Konsumen');
+                }
+            } catch {
+                setError('Error fetching consumer data');
+            }
+            setLoading(false);
+        };
+
+        fetchConsumerDetails();
+    }, [idKonsumen]);
+
+    // Fetch konsultan users
+    useEffect(() => {
+        const fetchKonsultanUsers = async () => {
+            try {
+                const response = await axios.get('https://backend-pst.vercel.app/users/konsultan');
+                const allKonsultanUsers = response.data;
+
+                // Filter consultants based on selected topics
+                const filteredKonsultanUsers = allKonsultanUsers.filter(konsultan => {
+                    if (!topicValue.length) return true; // If no topics are selected, show all consultants
+                    return topicValue.every(topic => konsultan.topics.includes(topic));
+                });
+
+                setKonsultanUsers(filteredKonsultanUsers);
+            } catch (error) {
+                setError('Error fetching konsultan data');
+            }
+        };
+
+        fetchKonsultanUsers();
+    }, [topicValue]); // Run the effect whenever selected topics change
+
+
+    // Update selectedKonsultan name based on reservasi and konsultanUsers
+    useEffect(() => {
+        if (reservasi && konsultanUsers.length > 0) {
+            const selectedKonsultanUser = konsultanUsers.find(k => k._id === reservasi.idKonsultan);
+            if (selectedKonsultanUser) {
+                setSelectedKonsultan(selectedKonsultanUser._id); // Use ID here
+            } else {
+                console.error("Selected Konsultan not found in the konsultanUsers list.");
+            }
+        }
+    }, [reservasi, konsultanUsers]);
+
+
+    // Fetch and set rating value and status
+    useEffect(() => {
+        const fetchRatingId = async () => {
+            try {
+                const response = await axios.get(`https://backend-pst.vercel.app/rating?idReservasi=${reservasi._id}`);
+                const ratings = response.data;
+                if (Array.isArray(ratings) && ratings.length > 0) {
+                    const rating = ratings.find(r => r.idReservasi === reservasi._id);
+                    if (rating) {
+                        setRateValue(rating.score);
+                        setIsRatingDisabled(reservasi.status !== "Menunggu Konfirmasi" && rating.score > 0);
+                    } else {
+                        setRateValue(0);
+                        setIsRatingDisabled(reservasi.status !== "Menunggu Konfirmasi");
+                    }
+                } else {
+                    setRateValue(0);
+                    setIsRatingDisabled(reservasi.status !== "Menunggu Konfirmasi");
+                }
+            } catch (error) {
+                console.error('Error fetching rating ID:', error);
+                setMessage('Gagal mendapatkan ID rating');
+                setMessageType('error');
+            }
+        };
+
+        fetchRatingId();
+    }, [reservasi]);
+
+    // Initialize form values
     useEffect(() => {
         if (reservasi) {
             setEditReservasiData(reservasi);
             setSelectedMethod(reservasi.method);
-            setSelectedReservasiDate(parseDate(reservasi.reservasiDate));
-            setSelectedKonsultan(reservasi.konsultan);
+            const formattedDate = formatDate(reservasi.reservasiDate) || '';
+            const isoDate = convertToISODate(formattedDate);
+            setSelectedReservasiDate(parseDate(isoDate));
             setSelectedTime(reservasi.time);
-            setKonsumenValue(reservasi.konsumen || "");
             setLinkValue(reservasi.link || "");
             setTopicValue(reservasi.topic || []);
-            setDescriptionValue(reservasi.descriptionReservasi || ""); // Initialize description value
-            setRateValue(reservasi.rating || 0); // Initialize rating value
+            setDescriptionValue(reservasi.descriptionReservasi || "");
+            setGenderValue(reservasi.genderKonsumen || "");
+            setCurrentStatus(reservasi.status || "");
+            setSelectedKonsultan(reservasi.nameKonsultan || "");
         }
     }, [reservasi]);
 
-    const handleSelectChange = (e) => {
-        const { name, value } = e.target;
-        if (name === "method") setSelectedMethod(value);
-        if (name === "konsultan") setSelectedKonsultan(value);
-        if (name === "time") setSelectedTime(value);
+    const handleChange = (setter) => (e) => setter(e.target.value);
+    const handleSelectChange = (value, key) => {
+        if (key === "time") setSelectedTime(value);
+        if (key === "method") setSelectedMethod(value);
+        if (key === "konsultan") setSelectedKonsultan(value);
     };
 
-    const handleKonsumenChange = (e) => {
-        setKonsumenValue(e.target.value);
-    };
+    const handleButtonClick = async () => {
+        const formattedDate = selectedReservasiDate ? formatDate(selectedReservasiDate) : '';
+        const isoDate = convertToISODate(formattedDate);
 
-    const handleLinkChange = (e) => {
-        setLinkValue(e.target.value);
-    };
-
-    const handleTopicChange = (e) => {
-        setTopicValue(e.target.value);
-    };
-
-    const handleDescriptionChange = (e) => {
-        setDescriptionValue(e.target.value);
-    };
-
-    const handleButtonClick = () => {
         const data = {
             method: selectedMethod,
             topic: topicValue,
-            reservasiDate: selectedReservasiDate,
+            reservasiDate: isoDate,
             time: selectedTime,
-            konsultan: selectedKonsultan,
-            konsumen: konsumenValue,
+            user: userValue,
             link: linkValue,
-            descriptionReservasi: descriptionValue, // Include description in data
-            rating: rateValue // Include rating in data
+            descriptionReservasi: descriptionValue,
+            rating: rateValue,
+            status: currentStatus,
+            gender: genderValue,
+            konsultan: selectedKonsultan
         };
-        setEditReservasiData(data);
+
+        try {
+            const response = await axios.get(`https://backend-pst.vercel.app/reservasi/${reservasi._id}`);
+            if (response.status === 200) {
+                const currentReservation = response.data;
+                const linkChanged = linkValue !== currentReservation.link;
+                const otherChanges =
+                    selectedMethod !== currentReservation.method ||
+                    selectedReservasiDate?.toString() !== currentReservation.reservasiDate?.toString() ||
+                    selectedTime !== currentReservation.time ||
+                    topicValue !== currentReservation.topic ||
+                    descriptionValue !== currentReservation.descriptionReservasi ||
+                    genderValue !== currentReservation.gender;
+                selectedKonsultan !== currentReservation.konsultan;
+
+                const newStatus = linkChanged && !otherChanges ? "Disetujui" : "Diubah Admin";
+
+                try {
+                    const updateResponse = await axios.put(`https://backend-pst.vercel.app/reservasi/${reservasi._id}`, { ...data, status: newStatus });
+                    if (updateResponse.status === 200) {
+                        setMessage('Reservasi berhasil diperbaharui');
+                        setMessageType('success');
+                        onClose(); // Close the modal after successful update
+                    } else {
+                        const errorDetails = await updateResponse.text();
+                        throw new Error(`HTTP error! Status: ${updateResponse.status}, Details: ${errorDetails}`);
+                    }
+                } catch (error) {
+                    setMessage('Reservasi gagal diperbaharui');
+                    setMessageType('error');
+                }
+            } else {
+                throw new Error('Error fetching current reservation data');
+            }
+        } catch (error) {
+            setMessage('Error fetching current reservation data');
+            setMessageType('error');
+        }
     };
 
-    let { locale } = useLocale();
+    const { locale } = useLocale();
     const isDateUnavailable = (date) => isWeekend(date, locale);
 
-    // Determine styles
-    const methodStatus = useMemo(() => selectedMethod !== "" ? "success" : "nonActive", [selectedMethod]);
+    const methodStatus = useMemo(() => selectedMethod ? "success" : "nonActive", [selectedMethod]);
+    const topicStatus = useMemo(() => topicValue.length ? "success" : "nonActive", [topicValue]);
+    const konsultanStatus = useMemo(() => selectedKonsultan ? "success" : "nonActive", [selectedKonsultan]);
     const reservasiDateStatus = useMemo(() => {
         if (!selectedReservasiDate) return "nonActive";
         const currentDate = today(getLocalTimeZone());
-        if (isDateUnavailable(selectedReservasiDate)) {
-            return "danger";
-        }
-        const status = selectedReservasiDate.compare(currentDate.add({ days: 2 })) < 0 ? "danger" : "success";
-        return status;
+        return isDateUnavailable(selectedReservasiDate) || selectedReservasiDate.compare(currentDate.add({ days: 2 })) < 0 ? "danger" : "success";
     }, [selectedReservasiDate, locale]);
-    const timeStatus = useMemo(() => selectedTime !== "" ? "success" : "nonActive", [selectedTime]);
-    const konsultanStatus = useMemo(() => selectedKonsultan !== "" ? "success" : "nonActive", [selectedKonsultan]);
-    const konsumenStatus = useMemo(() => getInputStyle(konsumenValue), [konsumenValue]);
-    const linkStatus = useMemo(() => (linkValue === "" ? "nonActive" : "success"), [linkValue]);
-    const topicStatus = useMemo(() => topicValue.length > 0 ? "success" : "nonActive", [topicValue]);
+    const timeStatus = useMemo(() => selectedTime ? "success" : "nonActive", [selectedTime]);
+    const userStatus = useMemo(() => getInputStyle(userValue), [userValue]);
+    const linkStatus = useMemo(() => linkValue ? "success" : "nonActive", [linkValue]);
     const descriptionStatus = useMemo(() => getInputStyle(descriptionValue), [descriptionValue]);
+    const genderStatus = useMemo(() => genderValue ? "success" : "nonActive", [genderValue]);
 
     const isButtonDisabled = useMemo(() => {
-        return (
-            methodStatus === "nonActive" || methodStatus === "danger" ||
-            topicStatus === "nonActive" || topicStatus === "danger" ||
-            reservasiDateStatus === "nonActive" || reservasiDateStatus === "danger" ||
-            timeStatus === "nonActive" || timeStatus === "danger" ||
-            konsumenStatus === "nonActive" || konsumenStatus === "danger" ||
-            konsultanStatus === "nonActive" || konsultanStatus === "danger" ||
-            linkStatus === "nonActive" || linkStatus === "danger" ||
-            descriptionStatus === "danger" // Include description status
-        );
-    }, [methodStatus, topicStatus, reservasiDateStatus, timeStatus, konsumenStatus, konsultanStatus, linkStatus, descriptionStatus]);
 
-    // Filter konsultanUsers based on the topicValue
-    const filteredKonsultanUsers = useMemo(() => {
-        if (topicValue.length === 0) return user.filter(u => u.role === "Konsultan");
-        return user.filter(u =>
-            u.role === "Konsultan" &&
-            u.field.some(field => topicValue.includes(field))
+        const allReadOnly = isRatingDisabled;
+
+        return (
+            allReadOnly ||
+            methodStatus === "nonActive" ||
+            topicStatus === "nonActive" ||
+            reservasiDateStatus === "nonActive" ||
+            timeStatus === "nonActive" ||
+            userStatus === "nonActive" ||
+            genderStatus === "nonActive" ||
+            linkStatus === "nonActive" ||
+            methodStatus === "danger" ||
+            topicStatus === "danger" ||
+            reservasiDateStatus === "danger" ||
+            timeStatus === "danger" ||
+            userStatus === "danger" ||
+            descriptionStatus === "danger" ||
+            genderStatus === "danger" ||
+            linkStatus === "danger"
         );
-    }, [topicValue]);
+
+    }, [methodStatus, topicStatus, reservasiDateStatus, timeStatus, userStatus, genderStatus, linkStatus, currentStatus, isRatingDisabled, descriptionStatus]);
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
@@ -128,7 +261,7 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     label="Tanggal Konsultasi"
                     variant="bordered"
                     value={selectedReservasiDate}
-                    minValue={today(getLocalTimeZone()).add({ days: 2 })}
+                    minValue={today(getLocalTimeZone())}
                     isRequired
                     className="w-full"
                     onChange={(date) => setSelectedReservasiDate(date)}
@@ -140,8 +273,8 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     label="Waktu"
                     className="w-full"
                     variant="bordered"
-                    selectedKeys={selectedTime ? [selectedTime] : []}
-                    onChange={handleSelectChange}
+                    selectedKeys={[selectedTime]}
+                    onChange={(value) => handleSelectChange(value, "time")}
                     isRequired
                     name="time"
                     color={timeStatus}
@@ -156,8 +289,8 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     label="Metode"
                     className="w-full"
                     variant="bordered"
-                    selectedKeys={selectedMethod ? [selectedMethod] : []}
-                    onChange={handleSelectChange}
+                    selectedKeys={[selectedMethod]}
+                    onChange={(value) => handleSelectChange(value, "method")}
                     isRequired
                     name="method"
                     color={methodStatus}
@@ -172,25 +305,35 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     label="Konsultan"
                     className="w-full"
                     variant="bordered"
-                    selectedKeys={selectedKonsultan ? [selectedKonsultan] : []}
-                    onChange={handleSelectChange}
-                    isRequired
-                    name="konsultan"
+                    selectedKeys={[selectedKonsultan]}
+                    value={selectedKonsultan} // Gunakan ID konsultan sebagai nilai
+                    onChange={(value) => handleSelectChange(value, "konsultan")}
                     color={konsultanStatus}
                 >
-                    {filteredKonsultanUsers.map((k) => (
-                        <SelectItem key={k.name} value={k.name}>
-                            {k.name}
+                    {konsultanUsers.map((user) => (
+                        <SelectItem key={user._id} value={user._id}>
+                            {user.name}
                         </SelectItem>
                     ))}
                 </Select>
+
+
+                <Input
+                    label="Jenis Kelamin Konsumen"
+                    variant="bordered"
+                    className="w-full"
+                    value={genderValue}
+                    onChange={handleChange(setGenderValue)}
+                    color={genderStatus}
+                    isReadOnly
+                />
                 <Input
                     label="Konsumen"
                     variant="bordered"
                     className="w-full"
-                    value={konsumenValue}
-                    onChange={handleKonsumenChange}
-                    color={konsumenStatus}
+                    value={userValue}
+                    onChange={handleChange(setUserValue)}
+                    color={userStatus}
                     isReadOnly
                 />
                 <Input
@@ -199,17 +342,15 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     className="w-full"
                     isReadOnly
                     value={topicValue.join(", ")}
-                    onChange={handleTopicChange}
+                    onChange={handleChange(setTopicValue)}
                     color={topicStatus}
                 />
-
-
                 <Input
                     label="Link"
                     variant="bordered"
                     className="w-full"
                     value={linkValue}
-                    onChange={handleLinkChange}
+                    onChange={handleChange(setLinkValue)}
                     color={linkStatus}
                     isRequired
                 />
@@ -218,20 +359,21 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     value={rateValue}
                     onChange={setRateValue}
                     className="flex justify-center items-center w-full"
+                    disabled={isRatingDisabled}
                 />
             </div>
             <Textarea
                 label="Deskripsi Topik"
                 variant="bordered"
-                //  placeholder="Masukkan deskripsi dari topik lebih lanjut"
                 disableAnimation
+                disableAutosize
                 classNames={{
-                    base: "w-full",
-                    input: `resize-y h-[3px]`,
+                    base: "max-h-[80px]",
                 }}
                 value={descriptionValue}
-                onChange={(e) => setDescriptionValue(e.target.value)}
+                onChange={handleChange(setDescriptionValue)}
                 color={descriptionStatus}
+                isReadOnly
             />
             <Button
                 variant='ghost'
@@ -243,6 +385,11 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
             >
                 Perbaharui
             </Button>
+            {message && (
+                <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                    <p>{message}</p>
+                </div>
+            )}
         </div>
     );
 };

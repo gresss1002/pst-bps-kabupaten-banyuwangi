@@ -1,10 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Button, Stack } from "@chakra-ui/react";
 import { DatePicker, Input, Select, SelectItem, Tooltip } from "@nextui-org/react";
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload } from 'antd';
 import { gender } from "../../../data";
+import axiosInstance from "../../../utils/axiosInstance";
+import formatDate from "../../../utils/formatedDate";
+import convertToISODate from "../../../utils/convertToISODate";
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -14,6 +17,26 @@ const getBase64 = (file) =>
     });
 
 const AdminFormProfile = () => {
+
+    const [userData, setUserData] = useState(null);
+    const userLocal = JSON.parse(localStorage.getItem('user'));
+
+
+    useEffect(() => {
+        getUserData();
+    }, []);
+
+    const getUserData = async () => {
+        try {
+            const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+            const userData = response.data.user;
+            console.log('User data:', response.data.user);
+            setUserData(userData);
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
+    
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
@@ -44,17 +67,21 @@ const AdminFormProfile = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [genders, setGender] = useState('');
-    // const [provinsi, setProvinsi] = useState('');
-    // const [kabupaten, setKabupaten] = useState('');
-    // const [kabupatenFiltered, setKabupatenFiltered] = useState([]);
-    // const [jabatan, setJabatan] = useState('');
-    // const [bidang, setBidang] = useState('');
-    // const [hari, setHari] = useState('');
-    const [date, setDate] = useState(null);
-    const [telepon, setTelepon] = useState('');
-    // const [kabupatenTouched, setKabupatenTouched] = useState(false);
+    const [birthDate, setBirthDate] = useState(null);
+    const [telephone, setTelephone] = useState('');
     const [image, setImage] = useState(null); // State untuk menyimpan file gambar
     const [imageStatus, setImageStatus] = useState('nonActive'); // Status upload gambar
+
+
+    useEffect(() => {
+        if (userData !== null) {
+            setName(userData?.name || '');
+            setEmail(userData?.email || '');
+            setGender(userData?.gender || '');
+            setBirthDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
+            setTelephone(userData?.telephone || '');
+        }
+    }, [userData]);
 
     // Status Validasi
     const nameStatus = useMemo(() => {
@@ -75,82 +102,50 @@ const AdminFormProfile = () => {
         return "danger";
     }, [genders]);
 
-    // const provinsiStatus = useMemo(() => {
-    //     if (provinsi === "") return "nonActive";
-    //     if (provinsi !== "") return "success";
-    //     return "danger";
-    // }, [provinsi]);
-
-    // const isKabupatenValid = useMemo(() => provinsiStatus === "success" && kabupaten !== '', [provinsiStatus, kabupaten]);
-
-    // const kabupatenStatus = useMemo(() => {
-    //     if (!kabupatenTouched) return "nonActive"; // Field kabupaten belum disentuh, status nonActive
-    //     if (provinsiStatus === 'nonActive' || provinsiStatus === 'danger') return "danger"; // Provinsi nonActive atau danger
-    //     if (provinsiStatus === 'success') {
-    //         if (kabupaten !== "" && isKabupatenValid) return "success"; // Kabupaten tidak kosong dan valid
-    //         if (kabupaten === "") return "nonActive"; // Kabupaten kosong
-    //     }
-    //     return "danger"; // Default to danger if no other condition matches
-    // }, [kabupaten, provinsiStatus, kabupatenTouched, isKabupatenValid]);
-
-    // const jabatanStatus = useMemo(() => {
-    //     if (jabatan === "") return "nonActive";
-    //     if (jabatan !== "") return "success";
-    //     return "danger";
-    // }, [jabatan]);
-
-    // const bidangStatus = useMemo(() => {
-    //     if (bidang === "") return "nonActive";
-    //     if (bidang !== "") return "success";
-    //     return "danger";
-    // }, [bidang]);
-
-    // const hariStatus = useMemo(() => {
-    //     if (hari === "") return "nonActive";
-    //     if (hari !== "") return "success";
-    //     return "danger";
-    // }, [hari]);
-
-    const dateStatus = useMemo(() => {
-        if (date === null) return "nonActive";
-        if (date !== null) return "success";
+    const birthDateStatus = useMemo(() => {
+        if (birthDate === null) return "nonActive";
+        if (birthDate !== null) return "success";
         return "danger";
-    }, [date]);
+    }, [birthDate]);
 
-    const teleponStatus = useMemo(() => {
-        if (telepon === "") return "nonActive";
-        if (/^08\d{10}$/.test(telepon)) return "success";
+    const telephoneStatus = useMemo(() => {
+        if (telephone === "") return "nonActive";
+        if (/^08\d{10}$/.test(telephone)) return "success";
         return "danger";
-    }, [telepon]);
+    }, [telephone]);
 
-    // useEffect(() => {
-    //     const selectedProvinsi = prov.find(p => p.provinsi === provinsi);
-    //     if (selectedProvinsi) {
-    //         setKabupatenFiltered(selectedProvinsi.kabupaten);
-    //     } else {
-    //         setKabupatenFiltered([]);
-    //     }
-    // }, [provinsi]);
+    const handlePerbaruiButtonClick = () => {
+        const updatedUserData = {
+            name: name,
+            email: email,
+            gender: genders,
+            birthDate: formatDate(birthDate),
+            telephone: telephone
+        };
 
+        console.log("Updated User Data:", updatedUserData);
 
-    // const handleProvinsiChange = (value) => {
-    //     setProvinsi(value);
-    //     setKabupaten(""); // Reset kabupaten when provinsi changes
-    // };
+        updateUserData(updatedUserData);
+    }
 
-    // const handleKabupatenClick = () => {
-    //     setKabupatenTouched(true); // Track interaction with Kabupaten dropdown
-    // };
+    const updateUserData = async (updatedUserData) => {
+        try {
+            const response = await axiosInstance.patch(`/users/${userData._id}`, updatedUserData);
+            console.log("User data updated successfully:", response.data);
+        } catch (error) {
+            console.error("Error updating user data:", error);
+        }
+    }
 
     const isButtonDisabled = useMemo(() => {
         return (
             nameStatus === "nonActive" || nameStatus === "danger" ||
             emailStatus === "nonActive" || emailStatus === "danger" ||
             genderStatus === "nonActive" || genderStatus === "danger" ||
-            dateStatus === "nonActive" || dateStatus === "danger" ||
-            teleponStatus === "nonActive" || teleponStatus === "danger"
+            birthDateStatus === "nonActive" || birthDateStatus === "danger" ||
+            telephoneStatus === "nonActive" || telephoneStatus === "danger"
         );
-    }, [nameStatus, emailStatus, genderStatus, dateStatus, teleponStatus]);
+    }, [nameStatus, emailStatus, genderStatus, birthDateStatus, telephoneStatus]);
 
     return (
         <div className="flex min-h-screen my-4 mx-2">
@@ -216,6 +211,7 @@ const AdminFormProfile = () => {
                             errorMessage={genderStatus === "danger" ? "Pilih Jenis Kelamin" : ""}
                             onChange={(e) => setGender(e.target.value)}
                             isRequired
+                            selectedKeys={[genders]}
                         >
                             {gender.map((jk) => (
                                 <SelectItem key={jk.value} value={jk.value}>
@@ -228,11 +224,13 @@ const AdminFormProfile = () => {
                             label="Tanggal Lahir"
                             variant="bordered"
                             maxValue={today(getLocalTimeZone()).subtract({ years: 10 })}
-                            color={dateStatus}
-                            onChange={(date) => setDate(date)}
-                            showMonthAndYearPickers
-                            isRequired
                             className="w-full"
+                            isInvalid={birthDateStatus === "danger"}
+                            color={birthDateStatus}
+                            errorMessage={birthDateStatus === "danger" ? "Masukkan tanggal lahir yang valid" : ""}
+                            value={birthDate}
+                            onChange={setBirthDate}
+                            showMonthAndYearPickers
                         />
 
                         {/* <Select
@@ -328,14 +326,14 @@ const AdminFormProfile = () => {
                         </Select> */}
 
                         <Input
-                            value={telepon}
-                            type="text"
+                            value={telephone}
+                            type="tel"
                             label="Nomor Telepon"
                             variant="bordered"
-                            isInvalid={teleponStatus === "danger"}
-                            color={teleponStatus}
-                            errorMessage={teleponStatus === "danger" ? "Masukkan nomor telepon yang valid (08XXXXXXXXXX)" : ""}
-                            onChange={(e) => setTelepon(e.target.value)}
+                            isInvalid={telephoneStatus === "danger"}
+                            color={telephoneStatus}
+                            errorMessage={telephoneStatus === "danger" ? "Nomor Telepon harus berupa 08xxxxxxxxxx" : ""}
+                            onChange={(e) => setTelephone(e.target.value)}
                             className="w-full"
                             isRequired
                         />
@@ -344,7 +342,7 @@ const AdminFormProfile = () => {
                     </div>
                 </Stack>
                 <div className="flex flex-col justify-center items-center h-[60px] text-[14px] gap-1 mt-2">
-                    <Button variant='ghost' colorScheme='bluePrimary' className="text-nonActive border-2 hover:bg-bluePrimary hover:text-white gap-2" style={{ borderRadius: "20px", width: '110px' }} isDisabled={isButtonDisabled}>
+                    <Button variant='ghost' colorScheme='bluePrimary' className="text-nonActive border-2 hover:bg-bluePrimary hover:text-white gap-2" style={{ borderRadius: "20px", width: '110px' }} isDisabled={isButtonDisabled} onClick={handlePerbaruiButtonClick}>
                         Perbaharui
                     </Button>
                 </div>

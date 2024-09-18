@@ -1,18 +1,8 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useMemo, useEffect } from "react";
-import { Button, Card, CardBody, Stack } from "@chakra-ui/react";
-import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
-import { today, getLocalTimeZone, parseDate, isWeekend } from "@internationalized/date";
-import { useLocale } from "@react-aria/i18n";
+import { Button } from "@chakra-ui/react";
+import { Input, Select, SelectItem } from "@nextui-org/react";
+import axiosInstance from "../../../utils/axiosInstance";
 import { role } from "../../../data";
-// pastikan path ini benar sesuai struktur project Anda
-
-// const getInputStyle = (value) => {
-//   if (value === "") return "nonActive";
-//   if (/^[a-zA-Z\s]+$/.test(value)) return "success";
-//   if (/\d/.test(value)) return "danger";
-//   return "nonActive";
-// };
 
 const AdminModalTabelKonsultan = ({ users }) => {
   const [editUsersData, setEditUsersData] = useState({});
@@ -28,11 +18,13 @@ const AdminModalTabelKonsultan = ({ users }) => {
   const [positionValue, setPositionValue] = useState("");
   const [fieldValue, setFieldValue] = useState("");
   const [availableValue, setAvailableValue] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
   useEffect(() => {
     if (users) {
       setEditUsersData(users);
-      setSelectedRole(users.role);
+      setSelectedRole(users.role || "");
       setNameValue(users.name || "");
       setEmailValue(users.email || "");
       setGenderValue(users.gender || "");
@@ -56,8 +48,12 @@ const AdminModalTabelKonsultan = ({ users }) => {
     setter(e.target.value);
   };
 
-  const handleButtonClick = () => {
-    const data = {
+  const handleButtonClick = async () => {
+    if (!window.confirm("Apakah Anda yakin ingin mengubah data konsultan ini?")) {
+      return;
+    }
+
+    const updatedUserData = {
       role: selectedRole,
       name: nameValue,
       email: emailValue,
@@ -71,11 +67,19 @@ const AdminModalTabelKonsultan = ({ users }) => {
       field: fieldValue,
       available: availableValue,
     };
-    setEditUsersData(data);
-  };
 
-  let { locale } = useLocale();
-  const isDateUnavailable = (date) => isWeekend(date, locale);
+    try {
+      const response = await axiosInstance.patch(`/users/${users._id}`, updatedUserData);
+      console.log("User updated successfully:", response.data);
+      setEditUsersData(response.data);
+      setMessage("Pengubahan data konsultan berhasil!");
+      setMessageType("success");
+    } catch (error) {
+      console.error("Error updating user:", error);
+      setMessage("Gagal mengubah data konsultan. Silakan coba lagi.");
+      setMessageType("error");
+    }
+  };
 
   const roleStatus = useMemo(() => (selectedRole !== "" ? "success" : "nonActive"), [selectedRole]);
   const nameStatus = useMemo(() => (nameValue === "" ? "nonActive" : "success"), [nameValue]);
@@ -92,20 +96,20 @@ const AdminModalTabelKonsultan = ({ users }) => {
 
   const isButtonDisabled = useMemo(() => {
     return (
-      roleStatus === "nonActive" ||
-      nameStatus === "nonActive" ||
-      emailStatus === "nonActive" ||
-      genderStatus === "nonActive" ||
-      districtsStatus === "nonActive" ||
-      subsdistrictsStatus === "nonActive" ||
-      workStatus === "nonActive" ||
-      educationStatus === "nonActive" ||
-      telephonesStatus === "nonActive" ||
-      positionStatus === "nonActive" ||
-      fieldStatus === "nonActive" ||
-      availableStatus === "nonActive"
+      roleStatus === "danger" ||
+      nameStatus === "danger" ||
+      emailStatus === "danger" ||
+      genderStatus === "danger" ||
+      districtsStatus === "danger" ||
+      subsdistrictsStatus === "danger" ||
+      workStatus === "danger" ||
+      educationStatus === "danger" ||
+      telephonesStatus === "danger" ||
+      positionStatus === "danger" ||
+      fieldStatus === "danger" ||
+      availableStatus === "danger"
     );
-  }, [nameStatus, emailStatus, genderStatus, districtsStatus, subsdistrictsStatus, workStatus, educationStatus, telephonesStatus, roleStatus, positionStatus, fieldStatus, availableStatus]);
+  }, [roleStatus, nameStatus, emailStatus, genderStatus, districtsStatus, subsdistrictsStatus, workStatus, educationStatus, telephonesStatus, positionStatus, fieldStatus, availableStatus]);
 
   return (
     <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
@@ -164,17 +168,8 @@ const AdminModalTabelKonsultan = ({ users }) => {
           color={availableStatus}
           isRequired
         />
-        {/* <Input
-          label="Pendidikan Terakhir"
-          variant="bordered"
-          className="w-full"
-          value={educationValue}
-          onChange={handleInputChange(setEducationValue)}
-          color={educationStatus}
-          isRequired
-        /> */}
         <Input
-          label="Telephones"
+          label="Telepon"
           variant="bordered"
           className="w-full"
           value={telephonesValue}
@@ -210,6 +205,13 @@ const AdminModalTabelKonsultan = ({ users }) => {
       >
         Perbaharui
       </Button>
+
+      {/* Notification Message */}
+      {message && (
+        <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+          <p>{message}</p>
+        </div>
+      )}
     </div>
   );
 };

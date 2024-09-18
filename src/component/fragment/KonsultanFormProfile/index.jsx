@@ -18,7 +18,27 @@ const getBase64 = (file) =>
     });
 
 
-const KonsultanFormProfile = ({ userData }) => {
+const KonsultanFormProfile = () => {
+    const [userData, setUserData] = useState(null);
+    const userLocal = JSON.parse(localStorage.getItem('user'));
+
+
+    useEffect(() => {
+        getUserData();
+    }, []);
+
+    const getUserData = async () => {
+        try {
+            const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+            const userData = response.data.user;
+            console.log('User data:', response.data.user);
+            setUserData(userData);
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
+
+    
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
@@ -95,24 +115,7 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
         return "danger";
     }, [genders]);
 
-    // const provinsiStatus = useMemo(() => {
-    //     if (provinsi === "") return "nonActive";
-    //     if (provinsi !== "") return "success";
-    //     return "danger";
-    // }, [provinsi]);
-
-    // const isKabupatenValid = useMemo(() => provinsiStatus === "success" && kabupaten !== '', [provinsiStatus, kabupaten]);
-
-    // const kabupatenStatus = useMemo(() => {
-    //     if (!kabupatenTouched) return "nonActive"; // Field kabupaten belum disentuh, status nonActive
-    //     if (provinsiStatus === 'nonActive' || provinsiStatus === 'danger') return "danger"; // Provinsi nonActive atau danger
-    //     if (provinsiStatus === 'success') {
-    //         if (kabupaten !== "" && isKabupatenValid) return "success"; // Kabupaten tidak kosong dan valid
-    //         if (kabupaten === "") return "nonActive"; // Kabupaten kosong
-    //     }
-    //     return "danger"; // Default to danger if no other condition matches
-    // }, [kabupaten, provinsiStatus, kabupatenTouched, isKabupatenValid]);
-
+    
     const positionStatus = useMemo(() => {
         if (positions === "") return "nonActive";
         if (positions !== "") return "success";
@@ -127,17 +130,6 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
         return availables.length > 0 ? "success" : "nonActive"; 
     }, [availables]);
 
-    // const fieldStatus = useMemo(() => {
-    //     if (fields === ([])) return "nonActive";
-    //     if (fields !== ([])) return "success";
-    //     return "danger";
-    // }, [fields]);
-
-    // const availableStatus = useMemo(() => {
-    //     if (availables === ([])) return "nonActive";
-    //     if (availables !== ([])) return "success";
-    //     return "danger";
-    // }, [availables]);
 
     const birthDateStatus = useMemo(() => {
         if (birthDate === null) return "nonActive";
@@ -151,41 +143,6 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
         return "danger";
     }, [telepon]);
 
-    // useEffect(() => {
-    //     const selectedProvinsi = prov.find(p => p.provinsi === provinsi);
-    //     if (selectedProvinsi) {
-    //         setKabupatenFiltered(selectedProvinsi.kabupaten);
-    //     } else {
-    //         setKabupatenFiltered([]);
-    //     }
-    // }, [provinsi]);
-
-
-    // const handleProvinsiChange = (value) => {
-    //     setProvinsi(value);
-    //     setKabupaten(""); // Reset kabupaten when provinsi changes
-    // };
-
-    // const handleKabupatenClick = () => {
-    //     setKabupatenTouched(true); // Track interaction with Kabupaten dropdown
-    // };
-
-    // const handlePerbaruiButtonClick = () => {
-    //     const upbirthDatedUserData = {
-    //         name: name,
-    //         email: email,
-    //         gender: genders,
-    //         birthDate : formatDate(birthDate),
-    //         telephone: telepon,
-    //         position: positions,
-    //         field: fields,
-    //         available: availables
-    //     };
-
-    //     console.log("UpbirthDated User Data:", upbirthDatedUserData);
-
-    //     upbirthDateUserData(upbirthDatedUserData);
-    // }
     const handlePerbaruiButtonClick = () => {
         const updatedUserData = {
             name: name,
@@ -312,45 +269,7 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
                             value={birthDate}
                         />
 
-                        {/* <Select
-                            label="Asal Provinsi"
-                            className="w-full"
-                            variant="bordered"
-                            isInvalid={provinsiStatus === "danger"}
-                            color={provinsiStatus}
-                            errorMessage={provinsiStatus === "danger" ? "Pilih provinsi" : ""}
-                            onChange={(e) => handleProvinsiChange(e.target.value)}
-                            isRequired
-                        >
-                            {prov.map((item) => (
-                                <SelectItem key={item.provinsi} value={item.provinsi}>
-                                    {item.provinsi}
-                                </SelectItem>
-                            ))}
-                        </Select> */}
-
-                        {/* <Select
-                            label="Asal Kabupaten/Kota"
-                            className="w-full"
-                            variant="bordered"
-                            isInvalid={kabupatenStatus === "danger"}
-                            color={kabupatenStatus}
-                            errorMessage={
-                                kabupatenStatus === "danger"
-                                    ? "Pilih asal provinsi terlebih dahulu"
-                                    : ""
-                            }
-                            onClick={handleKabupatenClick}
-                            onChange={(e) => setKabupaten(e.target.value)}
-                            isRequired
-                        >
-                            {kabupatenFiltered.map((k) => (
-                                <SelectItem key={k.value} value={k.value}>
-                                    {k.label}
-                                </SelectItem>
-                            ))}
-                        </Select> */}
-
+                        
                         <Select
                             label="Jabatan"
                             className="w-full"
@@ -376,7 +295,7 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
                             selectionMode="multiple"
                             isInvalid={fieldStatus === "danger"}
                             color={fieldStatus}
-                            errorMessage={fieldStatus === "danger" ? "Pilih pendidikan" : ""}
+                            errorMessage={fieldStatus === "danger" ? "Pilih bidang Anda" : ""}
                             onSelectionChange={(e) => setField(Array.from(e))}
                             isRequired
                             selectedKeys={fields}
@@ -395,7 +314,7 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
                             selectionMode="multiple"
                             isInvalid={availableStatus === "danger"}
                             color={availableStatus}
-                            errorMessage={availableStatus === "danger" ? "Pilih pendidikan" : ""}
+                            errorMessage={availableStatus === "danger" ? "Pilih hari ketersediaan Anda" : ""}
                             onSelectionChange={(e) => setAvailable(Array.from(e))}
                             isRequired
                             selectedKeys={availables}

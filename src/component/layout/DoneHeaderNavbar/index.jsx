@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, User } from "@nextui-org/react";
 import axiosInstance from '../../../utils/axiosInstance';
 
-const DoneLoginHeaderNavbar = ({ userData }) => {
+const DoneLoginHeaderNavbar = () => {
   const [activeSection, setActiveSection] = useState(window.location.hash || '#beranda');
+  const [userData, setUserData] = useState(null);
+  const userLocal = JSON.parse(localStorage.getItem('user'));
+  
 
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -20,7 +26,21 @@ const DoneLoginHeaderNavbar = ({ userData }) => {
     };
   }, []);
 
+
   const isActive = (href) => href === activeSection;
+
+
+  const getUserData = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
+      const userData = response.data.user;
+      console.log('User data:', response.data.user);
+      setUserData(userData);  
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
 
   return (
     <Navbar

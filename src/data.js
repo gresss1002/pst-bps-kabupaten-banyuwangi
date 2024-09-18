@@ -510,12 +510,14 @@ export const reservasi = [
         time: "09:00",
         konsultan: "Alex Smith",
         konsumen: "John Doe",
-        topic: ["Survei Ekonomi"],
+        topic: ["Survei Pertanian"],
         method: "Online",
         queue: 1,
         status: "Disetujui",
         link: "http://example.com/reservasi1",
-        descriptionReservasi: "Konsultasi mengenai survei ekonomi dan sosial untuk perencanaan bisnis."
+        descriptionReservasi: "Konsultasi mengenai survei ekonomi dan sosial untuk perencanaan bisnis.",
+        genderKonsultan: "Laki-laki",
+        genderKonsumen: "Laki-laki"
     },
     {
         reservasiDate: "2024-09-16",
@@ -527,7 +529,9 @@ export const reservasi = [
         queue: 2,
         status: "Selesai",
         link: "http://example.com/reservasi2",
-        descriptionReservasi: "Diskusi terkait survei lingkungan dan dampak sosial."
+        descriptionReservasi: "Diskusi terkait survei lingkungan dan dampak sosial.",
+        genderKonsultan: "Perempuan",
+        genderKonsumen: "Perempuan"
     },
     {
         reservasiDate: "2024-09-17",
@@ -539,7 +543,9 @@ export const reservasi = [
         queue: 3,
         status: "Diubah Admin",
         link: "http://example.com/reservasi3",
-        descriptionReservasi: "Pembatalan konsultasi mengenai survei teknologi."
+        descriptionReservasi: "Pembatalan konsultasi mengenai survei teknologi.",
+        genderKonsultan: "Laki-laki",
+        genderKonsumen: "Laki-laki"
     },
     {
         reservasiDate: "2024-09-18",
@@ -551,7 +557,9 @@ export const reservasi = [
         queue: 4,
         status: "Disetujui",
         link: "http://example.com/reservasi4",
-        descriptionReservasi: "Konsultasi untuk mempelajari survei ekonomi terbaru."
+        descriptionReservasi: "Konsultasi untuk mempelajari survei ekonomi terbaru.",
+        genderKonsultan: "Laki-laki",
+        genderKonsumen: "Perempuan"
     },
     {
         reservasiDate: "2024-09-19",
@@ -563,7 +571,9 @@ export const reservasi = [
         queue: 5,
         status: "Selesai",
         link: "http://example.com/reservasi5",
-        descriptionReservasi: "Konsultasi menyeluruh mengenai survei sosial dan pendidikan."
+        descriptionReservasi: "Konsultasi menyeluruh mengenai survei sosial dan pendidikan.",
+        genderKonsultan: "Laki-laki",
+        genderKonsumen: "Perempuan"
     },
     {
         reservasiDate: "2024-09-20",
@@ -575,7 +585,9 @@ export const reservasi = [
         queue: 6,
         status: "Belum Disetujui",
         link: "http://example.com/reservasi6",
-        descriptionReservasi: "Diskusi mendalam mengenai teknik survei pertanian."
+        descriptionReservasi: "Diskusi mendalam mengenai teknik survei pertanian.",
+        genderKonsultan: "Laki-laki",
+        genderKonsumen: "Laki-laki"
     },
     {
         reservasiDate: "2024-09-21",
@@ -587,7 +599,9 @@ export const reservasi = [
         queue: 7,
         status: "Diubah Konsultan",
         link: "http://example.com/reservasi7",
-        descriptionReservasi: "Konsultasi tentang survei kesehatan dan implikasi kebijakan."
+        descriptionReservasi: "Konsultasi tentang survei kesehatan dan implikasi kebijakan.",
+        genderKonsultan: "Perempuan",
+        genderKonsumen: "Perempuan"
     },
     {
         reservasiDate: "2024-09-22",
@@ -599,7 +613,9 @@ export const reservasi = [
         queue: 8,
         status: "Diubah Admin",
         link: "http://example.com/reservasi8",
-        descriptionReservasi: "Konsultasi yang dibatalkan mengenai survei sosial dan lingkungan."
+        descriptionReservasi: "Konsultasi yang dibatalkan mengenai survei sosial dan lingkungan.",
+        genderKonsultan: "Laki-laki",
+        genderKonsumen: "Perempuan"
     },
     {
         reservasiDate: "2024-09-23",
@@ -611,7 +627,9 @@ export const reservasi = [
         queue: 9,
         status: "Selesai",
         link: "http://example.com/reservasi9",
-        descriptionReservasi: "Evaluasi hasil survei lingkungan terbaru."
+        descriptionReservasi: "Evaluasi hasil survei lingkungan terbaru.",
+        genderKonsultan: "Perempuan",
+        genderKonsumen: "Laki-laki"
     },
     {
         reservasiDate: "2024-09-24",
@@ -623,7 +641,9 @@ export const reservasi = [
         queue: 10,
         status: "Belum Disetujui",
         link: "http://example.com/reservasi10",
-        descriptionReservasi: "Konsultasi tentang metodologi survei pendidikan."
+        descriptionReservasi: "Konsultasi tentang metodologi survei pendidikan.",
+        genderKonsultan: "Laki-laki",
+        genderKonsumen: "Laki-laki"
     }
 ];
 

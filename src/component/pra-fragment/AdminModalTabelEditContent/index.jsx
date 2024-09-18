@@ -1,79 +1,77 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@chakra-ui/react";
 import { Input } from "@nextui-org/react";
+import axiosInstance from "../../../utils/axiosInstance";
 
-const AdminModalTabelEditContent = ({ swiper }) => {
+const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
     const [imageValue, setImageValue] = useState("");
     const [contentValue, setContentValue] = useState("");
     const [titleValue, setTitleValue] = useState("");
     const [linkValue, setLinkValue] = useState("");
+    const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
     useEffect(() => {
         if (swiper) {
-            setImageValue(swiper.image || ""); // Handle image as a URL string
+            setImageValue(swiper.image || "");
             setContentValue(swiper.content || "");
             setTitleValue(swiper.title || "");
             setLinkValue(swiper.link || "");
         }
     }, [swiper]);
 
-    const handleImageChange = (e) => {
-        setImageValue(e.target.value);
+    const handleInputChange = (setter) => (e) => {
+        setter(e.target.value);
     };
 
-    const handleContentChange = (e) => {
-        setContentValue(e.target.value);
-    };
+    const handleButtonClick = async () => {
+        if (!window.confirm("Apakah Anda yakin ingin mengubah data ini?")) {
+            return;
+        }
 
-    const handleTitleChange = (e) => {
-        setTitleValue(e.target.value);
-    };
+        if (!swiper || !swiper._id) {
+            console.error("Swiper id is missing.");
+            setMessage("Gagal mengubah data. ID swiper tidak ditemukan.");
+            setMessageType("error");
+            return;
+        }
 
-    const handleLinkChange = (e) => {
-        setLinkValue(e.target.value);
-    };
-
-    const handleButtonClick = () => {
-        const data = {
+        const updatedData = {
             link: linkValue,
             image: imageValue,
             content: contentValue,
             title: titleValue,
         };
-        // Add logic to handle the data, such as sending it to a server
-        console.log("Updated Data:", data);
+
+        try {
+            const response = await axiosInstance.put(`/swiper/${swiper._id}`, updatedData);
+
+            console.log("Swiper updated successfully:", response.data);
+            setMessage("Data berhasil diperbarui!");
+            setMessageType("success");
+            onUpdate(response.data); // Notify parent component
+        } catch (error) {
+            console.error("Error updating swiper:", error);
+            setMessage("Gagal mengubah data. Silakan coba lagi.");
+            setMessageType("error");
+        }
     };
 
-    // Statuses for fields
-    const imageStatus = useMemo(() => {
-        if (imageValue === "") return "nonActive";
-        const urlRegex = /^https:\/\/.+$/;
-        if (urlRegex.test(imageValue)) return "success";
-        return "danger";
-    }, [imageValue]);
+    const imageStatus = useMemo(() => (imageValue === "" ? "nonActive" : "success"), [imageValue]);
+    const contentStatus = useMemo(() => (contentValue === "" ? "nonActive" : "success"), [contentValue]);
+    const titleStatus = useMemo(() => (titleValue === "" ? "nonActive" : "success"), [titleValue]);
+    const linkStatus = useMemo(() => (linkValue === "" ? "nonActive" : "success"), [linkValue]);
 
-    const contentStatus = useMemo(() => {
-        if (contentValue === "") return "nonActive";
-        return "success";
-    }, [contentValue]);
-
-    const titleStatus = useMemo(() => {
-        if (titleValue === "") return "nonActive";
-        return "success";
-    }, [titleValue]);
-
-    const linkStatus = useMemo(() => {
-        if (linkValue === "") return "nonActive";
-        return "success";
-    }, [linkValue]);
-
-    // Disable button if any field is nonActive or danger
     const isButtonDisabled = useMemo(() => {
         return (
-            imageStatus === "nonActive" || imageStatus === "danger" ||
-            contentStatus === "nonActive" || contentStatus === "danger" ||
-            titleStatus === "nonActive" || titleStatus === "danger" ||
-            linkStatus === "nonActive" || linkStatus === "danger"
+            imageStatus === "danger" ||
+            contentStatus === "danger" ||
+            titleStatus === "danger" ||
+            linkStatus === "danger"||
+            imageStatus === "nonActive" ||
+            contentStatus === "nonActive" ||
+            titleStatus === "nonActive" ||
+            linkStatus === "nonActive"
         );
     }, [imageStatus, contentStatus, titleStatus, linkStatus]);
 
@@ -85,7 +83,7 @@ const AdminModalTabelEditContent = ({ swiper }) => {
                     variant="bordered"
                     className="w-full"
                     value={imageValue}
-                    onChange={handleImageChange}
+                    onChange={handleInputChange(setImageValue)}
                     color={imageStatus}
                     isRequired
                 />
@@ -94,7 +92,7 @@ const AdminModalTabelEditContent = ({ swiper }) => {
                     variant="bordered"
                     className="w-full"
                     value={titleValue}
-                    onChange={handleTitleChange}
+                    onChange={handleInputChange(setTitleValue)}
                     color={titleStatus}
                     isRequired
                 />
@@ -103,7 +101,7 @@ const AdminModalTabelEditContent = ({ swiper }) => {
                     variant="bordered"
                     className="w-full"
                     value={contentValue}
-                    onChange={handleContentChange}
+                    onChange={handleInputChange(setContentValue)}
                     color={contentStatus}
                     isRequired
                 />
@@ -112,24 +110,30 @@ const AdminModalTabelEditContent = ({ swiper }) => {
                     variant="bordered"
                     className="w-full"
                     value={linkValue}
-                    onChange={handleLinkChange}
+                    onChange={handleInputChange(setLinkValue)}
                     color={linkStatus}
                     isRequired
                 />
             </div>
 
-            <Button 
-                variant='ghost' 
-                colorScheme='bluePrimary' 
-                className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white" 
-                style={{ borderRadius: "20px", width: '120px' }} 
+            <Button
+                variant="ghost"
+                colorScheme="bluePrimary"
+                className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white"
+                style={{ borderRadius: "20px", width: "120px" }}
                 onClick={handleButtonClick}
-                isDisabled={isButtonDisabled} // Disable button based on the status
+                isDisabled={isButtonDisabled}
             >
                 Perbaharui
             </Button>
+
+            {message && (
+                <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                    <p>{message}</p>
+                </div>
+            )}
         </div>
     );
-}
+};
 
 export default AdminModalTabelEditContent;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useDisclosure } from "@chakra-ui/react";
 import { Input, Modal, ModalHeader, ModalContent, ModalBody } from "@nextui-org/react";
 import { ConfigProvider, Table } from "antd";
@@ -6,27 +7,45 @@ import { FaPen, FaTrash } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import "./styles.css";
 import AdminModalTabelEditContent from "../../pra-fragment/AdminModalTabelEditContent";
-import { swiper } from "../../../data";
 
 const TabelEditContent = () => {
     const [filteredInfo, setFilteredInfo] = useState({});
     const [sortedInfo, setSortedInfo] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredData, setFilteredData] = useState([]);
+    const [swiperData, setSwiperData] = useState([]); // Swiper data state
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedSwiper, setSelectedSwiper] = useState(null);
 
+    // Fetch data from the API on component mount
     useEffect(() => {
-        const filtered = swiper.filter((item) =>
-            Object.keys(item).some((key) =>
-                String(item[key]).toLowerCase().includes(searchTerm.toLowerCase())
+
+        const fetchSwiperData = async () => {
+            try {
+                const response = await axios.get("https://backend-pst.vercel.app/swiper"); // Your API endpoint
+                setSwiperData(response.data); // Store the fetched data
+            } catch (error) {
+                console.error("Error fetching swiper data:", error);
+            }
+        };
+
+        fetchSwiperData();
+    }, []);
+
+    // Filter swiper data based on the search term
+    useEffect(() => {
+        const filtered = swiperData
+            .filter((item) =>
+                Object.keys(item).some((key) =>
+                    String(item[key]).toLowerCase().includes(searchTerm.toLowerCase())
+                )
             )
-        ).map((item, index) => ({
-            ...item,
-            key: index + 1 // Menambahkan key dinamis berdasarkan indeks
-        }));
+            .map((item, index) => ({
+                ...item,
+                key: index + 1 // Adding a dynamic key based on index
+            }));
         setFilteredData(filtered);
-    }, [searchTerm, swiper]);
+    }, [searchTerm, swiperData]);
 
     const handleEditClick = (swiper) => {
         setSelectedSwiper(swiper);
@@ -179,6 +198,6 @@ const TabelEditContent = () => {
             </Modal>
         </div>
     );
-}
+};
 
 export default TabelEditContent;

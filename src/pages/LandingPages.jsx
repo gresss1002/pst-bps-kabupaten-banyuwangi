@@ -58,7 +58,7 @@ const LandingPages = ({ setActiveSection }) => {
         <div className="flex flex-col">
             <ContentSection>
                 <section id="beranda" className="scroll-mt-[93px] flex flex-col gap-8">
-                    <div className='flex flex-col text-center font-inter gap-2'>
+                    <div className='flex flex-col text-center font-inter gap-2 mb-8'>
                         <p className="text-2xl font-bold text-bluePrimary">
                             Selamat datang di Pelayanan Statistik Terpadu BPS Kabupaten Banyuwangi
                         </p>
@@ -66,7 +66,7 @@ const LandingPages = ({ setActiveSection }) => {
                             Di website ini Anda dapat menemukan berbagai layanan yang kami sediakan dan informasi kontak yang dapat dihubungi
                         </p>
                     </div>
-                    <SearchBar />
+               
                     <SwiperContent />
                 </section>
                 <section id="tentang" className="scroll-mt-[93px]">

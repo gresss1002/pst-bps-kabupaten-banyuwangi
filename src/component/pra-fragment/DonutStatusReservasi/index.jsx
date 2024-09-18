@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
-import React from 'react';
-import DonutChart from '../../elements/DonutChart'; // Pastikan path ke DonutChart sudah benar
-import { reservasi } from '../../../data';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios'; // Import axios for HTTP requests
+import DonutChart from '../../elements/DonutChart'; // Ensure the path to DonutChart is correct
 
-// Fungsi untuk menghasilkan warna acak
+// Function to generate random colors
 const getRandomColors = (numColors) => {
   const colors = [];
   for (let i = 0; i < numColors; i++) {
@@ -15,30 +14,58 @@ const getRandomColors = (numColors) => {
 };
 
 const DonutStatusReservasi = () => {
-  // Fungsi untuk memproses data menjadi format yang diinginkan
-  const processReservasiData = (data) => {
-    // Hitung jumlah reservasi per status
-    const counts = data.reduce((acc, curr) => {
-      const status = curr.status;
-      if (acc[status]) {
-        acc[status] += 1;
-      } else {
-        acc[status] = 1;
+  const [data, setData] = useState([]);
+  const [processedData, setProcessedData] = useState({ labels: [], values: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchReservasiData = async () => {
+      try {
+        // Replace with your API endpoint
+        const response = await axios.get('https://backend-pst.vercel.app/reservasi');
+        setData(response.data);
+      } catch (err) {
+        setError('Failed to fetch data');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      return acc;
-    }, {});
+    };
 
-    // Ubah objek counts menjadi format yang diinginkan untuk chart
-    const labels = Object.keys(counts); // Mengambil kategori sebagai label
-    const values = Object.values(counts); // Mengambil jumlah sebagai series
+    fetchReservasiData();
+  }, []);
 
-    return { labels, values };
-  };
+  useEffect(() => {
+    if (data.length) {
+      const processReservasiData = (data) => {
+        // Count reservations by status
+        const counts = data.reduce((acc, curr) => {
+          const status = curr.status;
+          if (acc[status]) {
+            acc[status] += 1;
+          } else {
+            acc[status] = 1;
+          }
+          return acc;
+        }, {});
 
-  // Proses data
-  const processedData = processReservasiData(reservasi);
+        // Convert counts object to the desired format for chart
+        const labels = Object.keys(counts); // Get categories as labels
+        const values = Object.values(counts); // Get counts as series
 
-  // Dapatkan warna acak untuk setiap kategori
+        return { labels, values };
+      };
+
+      const processed = processReservasiData(data);
+      setProcessedData(processed);
+    }
+  }, [data]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
+  // Get random colors for each category
   const colors = getRandomColors(processedData.labels.length);
 
   return (
@@ -48,7 +75,7 @@ const DonutStatusReservasi = () => {
         labels={processedData.labels} // Pass labels to DonutChart
         chartTitle="Jumlah Reservasi Menurut Status"
         chartSubtitle="Distribusi status reservasi"
-        chartColors={colors} // Gunakan warna acak
+        chartColors={colors} // Use random colors
         legendPosition="bottom"
       />
     </div>

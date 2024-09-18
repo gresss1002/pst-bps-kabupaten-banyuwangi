@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@chakra-ui/react";
 import { Input, Modal, ModalHeader, ModalContent, ModalBody } from "@nextui-org/react";
@@ -6,6 +5,10 @@ import { ConfigProvider, Table } from "antd";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import "./styles.css";
+import convertToISODate from "../../../utils/convertToISODate";
+import formatDate from "../../../utils/formatedDate";
+import { parseDate } from "@internationalized/date";
+import dayjs from 'dayjs';
 
 const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
     const [filteredInfo, setFilteredInfo] = useState({});
@@ -16,17 +19,16 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
     const [selectedReservasi, setSelectedReservasi] = useState(null);
 
     useEffect(() => {
-        // Filter based on search term
-        const filtered = reservasi.filter((item) =>
-            Object.keys(item).some((key) =>
-                String(item[key]).toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        ).map((item, index) => ({
-            ...item,
-            key: index + 1 // Add dynamic key based on index
-        }));
+        // Adding order property to track creation sequence
+        const filtered = reservasi
+            .map((item, index) => ({
+                ...item,
+                key: item.id || `key-${index}`, // Unique key
+                order: index, // Track creation order
+            }))
+            .sort((a, b) => a.order - b.order); // Sort by creation order
         setFilteredData(filtered);
-    }, [searchTerm, reservasi]);
+    }, [reservasi]);
 
     const handleEditClick = (reservasi) => {
         setSelectedReservasi(reservasi);
@@ -41,23 +43,23 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
     const columns = [
         {
             title: "No",
-            dataIndex: "key",
-            key: "key",
-            sorter: (a, b) => a.key - b.key,
-            sortOrder: sortedInfo.columnKey === "key" ? sortedInfo.order : null,
-            width: '10%'
+            dataIndex: "order",
+            key: "order",
+            sorter: (a, b) => a.order - b.order, // Sort by creation order
+            render: (text, record) => record.order + 1, // Display 1-based index
+            width: '10%',
         },
         {
             title: "Tanggal",
             dataIndex: "reservasiDate",
             key: "reservasiDate",
-            filters: [...new Set(reservasi.map(item => item.reservasiDate))].map(date => ({ text: date, value: date })),
+            filters: [...new Set(reservasi.map(item => formatDate(item.reservasiDate)))].map(date => ({ text: date, value: date })),
             filteredValue: filteredInfo.date || null,
-            onFilter: (value, record) => record.reservasiDate.includes(value),
-            sorter: (a, b) => new Date(a.reservasiDate) - new Date(b.reservasiDate), // Perbaiki sorter untuk tanggal
-            sortOrder: sortedInfo.columnKey === "date" ? sortedInfo.order : null,
+            onFilter: (value, record) => formatDate(record.reservasiDate) === value,
+            sorter: (a, b) => new Date(a.reservasiDate) - new Date(b.reservasiDate),
+            sortOrder: sortedInfo.columnKey === "reservasiDate" ? sortedInfo.order : null,
+            render: (text) => formatDate(text),
             width: '18%',
-
         },
         {
             title: "Waktu",
@@ -69,9 +71,9 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
                 const timeA = new Date(1970, 0, 1, hoursA, minutesA);
                 const timeB = new Date(1970, 0, 1, hoursB, minutesB);
                 return timeA - timeB;
-            }, // Perbaiki sorter untuk waktu
+            }, // Sorter for time
             sortOrder: sortedInfo.columnKey === "time" ? sortedInfo.order : null,
-            width: '18%'
+            width: '18%',
         },
         {
             title: "Metode",
@@ -79,7 +81,7 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
             key: "method",
             sorter: (a, b) => a.method.length - b.method.length,
             sortOrder: sortedInfo.columnKey === "method" ? sortedInfo.order : null,
-            width: '14%'
+            width: '14%',
         },
         {
             title: "Status",
@@ -87,7 +89,7 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
             key: "status",
             sorter: (a, b) => a.status.length - b.status.length,
             sortOrder: sortedInfo.columnKey === "status" ? sortedInfo.order : null,
-            width: '20%'
+            width: '20%',
         },
         {
             title: "Antrian",
@@ -95,21 +97,20 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
             key: "queue",
             sorter: (a, b) => a.queue - b.queue,
             sortOrder: sortedInfo.columnKey === "queue" ? sortedInfo.order : null,
-            width: '10%'
+            width: '10%',
         },
         {
             title: "Aksi",
             dataIndex: "aksi",
             key: "aksi",
-            fixed:"right",
-            
+            fixed: "right",
             render: (_, reservasi) => (
                 <div className="flex space-x-3 justify-center items-center">
                     <FaPen className="cursor-pointer md:text-sm hover:text-bluePrimary" onClick={() => handleEditClick(reservasi)} />
                     <FaTrash className="cursor-pointer md:text-sm hover:text-red-600" />
                 </div>
             ),
-            width: '10%'
+            width: '10%',
         },
     ];
 
@@ -143,7 +144,6 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
                         ],
                     }}
                     endContent={<BiSearchAlt className="text-base flex justify-center items-center" />}
-                    // size="md"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -181,16 +181,16 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
                         index % 2 === 0 ? "even-row" : "odd-row"
                     }
                     scroll={{
-                         y: 300, 
-                         x: 'max-content' 
-                      }}
+                        y: 300,
+                        x: 'max-content'
+                    }}
                     pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '25', '50', '100'], position: ['bottomCenter'] }}
                     style={{ width: '100%' }}
                     className="mt-2 w-full font-openSans text-[10px]"
                 />
             </ConfigProvider>
 
-            <Modal size="3xl" isOpen={isOpen} onClose={handleCloseClick} style={{ marginTop: '113px', width: "100%" }}>
+            <Modal size="3xl" isOpen={isOpen} onClose={handleCloseClick} style={{ marginTop: '123px', width: "100%" }}>
                 <ModalContent>
                     <ModalHeader className="flex flex-col font-inter text-xl font-bold justify-center items-center text-bluePrimary">Form Reservasi</ModalHeader>
                     <ModalBody className="mb-4">

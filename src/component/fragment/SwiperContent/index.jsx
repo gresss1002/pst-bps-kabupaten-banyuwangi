@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { Card, Stack, Text } from "@chakra-ui/react"; // Tetap gunakan Card
+import { useEffect, useRef, useState } from "react";
+import { Card, Text } from "@chakra-ui/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, Pagination, A11y } from "swiper/modules";
 import "swiper/css";
@@ -8,7 +8,7 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { swiper } from "../../../data";
+import axios from "axios"; // Import axios or any HTTP client library of your choice
 
 const DynamicButton = ({ to, children }) => {
   const isInternalLink = to.startsWith("/");
@@ -31,7 +31,25 @@ const DynamicButton = ({ to, children }) => {
 };
 
 export const SwiperContent = () => {
+  const [swiperData, setSwiperData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const cardsRef = useRef([]);
+
+  useEffect(() => {
+    const fetchSwiperData = async () => {
+      try {
+        const response = await axios.get('https://backend-pst.vercel.app/swiper'); // Replace with your API endpoint
+        setSwiperData(response.data);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    };
+
+    fetchSwiperData();
+  }, []);
 
   useEffect(() => {
     const updateCardHeights = () => {
@@ -56,7 +74,10 @@ export const SwiperContent = () => {
     return () => {
       window.removeEventListener('resize', updateCardHeights);
     };
-  }, []);
+  }, [swiperData]); // Run effect when swiperData changes
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <Swiper
@@ -98,7 +119,7 @@ export const SwiperContent = () => {
         },
       }}
     >
-      {swiper.map((item, index) => (
+      {swiperData.map((item, index) => (
         <SwiperSlide key={index} className="flex">
           <Card
             ref={el => cardsRef.current[index] = el} // Set ref for each card
@@ -110,7 +131,7 @@ export const SwiperContent = () => {
                 <img 
                   src={item.image} 
                   alt={item.title} 
-                  className="object-contain w-full h-full rounded-xl" // Gunakan object-contain agar gambar tidak terpotong
+                  className="object-contain w-full h-full rounded-xl"
                 />
               </div>
               <div mt="4" spacing="2" className="flex flex-col">
