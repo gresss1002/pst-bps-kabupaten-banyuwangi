@@ -152,7 +152,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
-            <div className="grid grid-cols-2 gap-3 w-full mx-[12%]">
+            <div className="gap-3 w-full mx-[12%]">
                 {/* <Input
                     label="Image URL"
                     variant="bordered"
@@ -164,7 +164,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
                 /> */}
                 <Upload
                     customRequest={handleCustomRequest}
-                    listType="picture-card"
+                    listType="picture-circle"
                     fileList={fileList}
                     onPreview={handlePreview}
                     onChange={handleChange}
