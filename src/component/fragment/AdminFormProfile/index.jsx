@@ -82,18 +82,28 @@ const AdminFormProfile = () => {
     const handleCustomRequest = async ({ file, onSuccess, onError }) => {
         const formData = new FormData();
         formData.append('file', file);
-
+    
         try {
             const response = await axios.post('https://backend-pst.vercel.app/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+    
             if (response.data && response.data.url) {
                 // Simpan URL gambar di photoLink
                 setPhotoLink(response.data.url);
                 message.success('Upload successful!');
+    
+                // Perbarui fileList dengan gambar yang baru diupload
+                const newFileList = [{
+                    uid: file.uid,
+                    name: file.name,
+                    status: 'done',
+                    url: response.data.url,
+                }];
+                setFileList(newFileList);
+                setPreviewImage(response.data.url); // Setel pratinjau ke URL baru
                 onSuccess(response.data);
             } else {
                 message.error('Upload failed!');
@@ -104,6 +114,7 @@ const AdminFormProfile = () => {
             onError(error);
         }
     };
+    
 
 
     // Tombol upload gambar
