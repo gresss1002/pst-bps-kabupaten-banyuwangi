@@ -152,8 +152,8 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
-            <div className="flex gap-3 w-full mx-[12%] justify-center items-center">
-                <div className="flex-none w-[30%] p-2 ">
+            <div className="flex  w-full mx-[12%] justify-center items-center">
+                <div className="flex-none w-[30%] justify-center items-center">
                     <Upload
                         customRequest={handleCustomRequest}
                         listType="picture-circle"
@@ -177,7 +177,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
                         />
                     )}
                 </div>
-                <div className="flex-none w-[70%] p-2">
+                <div className="flex-none gap-3 w-[70%] ">
                     <Input
                         label="Judul"
                         variant="bordered"
