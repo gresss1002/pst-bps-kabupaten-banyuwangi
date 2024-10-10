@@ -152,7 +152,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
-            <div className="gap-3 w-full mx-[12%]">
+            <div className="flex flex-col gap-3 w-full mx-[12%]">
                 {/* <Input
                     label="Image URL"
                     variant="bordered"
