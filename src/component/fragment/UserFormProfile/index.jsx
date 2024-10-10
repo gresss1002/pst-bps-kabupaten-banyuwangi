@@ -246,11 +246,11 @@ const UserFormProfile = () => {
         try {
             const response = await axiosInstance.patch(`/users/${userData._id}`, updatedUserData);
             console.log("User data updated successfully:", response.data);
-            setMessage('Profile Anda berhasil diperbaharui');
+            setMessage('Profile berhasil diperbaharui');
             setMessageType('success');
         } catch (error) {
             console.error("Error updating user data:", error);
-            setMessage('Profile Anda gagal diperbarui. Silakan coba lagi.');
+            setMessage('Profile gagal diperbarui. Silakan coba lagi.');
             setMessageType('error');
         }
     }
