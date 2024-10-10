@@ -164,7 +164,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
                 /> */}
                 <Upload
                     customRequest={handleCustomRequest}
-                    listType="picture-circle"
+                    listType="picture-card"
                     fileList={fileList}
                     onPreview={handlePreview}
                     onChange={handleChange}
