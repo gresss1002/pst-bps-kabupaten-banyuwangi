@@ -8,6 +8,7 @@ import { gender } from "../../../data";
 import axiosInstance from "../../../utils/axiosInstance";
 import formatDate from "../../../utils/formatedDate";
 import convertToISODate from "../../../utils/convertToISODate";
+import axios from "axios";
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
