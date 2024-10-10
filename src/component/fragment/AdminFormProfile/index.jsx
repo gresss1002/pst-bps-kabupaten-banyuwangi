@@ -3,7 +3,7 @@ import { Button, Stack } from "@chakra-ui/react";
 import { DatePicker, Input, Select, SelectItem, Tooltip } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, Upload } from 'antd';
+import { Image, message, Upload } from 'antd';
 import { gender } from "../../../data";
 import axiosInstance from "../../../utils/axiosInstance";
 import formatDate from "../../../utils/formatedDate";
@@ -40,6 +40,30 @@ const AdminFormProfile = () => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [genders, setGender] = useState('');
+    const [birthDate, setBirthDate] = useState(null);
+    const [telephone, setTelephone] = useState('');
+    const [photoLink, setPhotoLink] = useState('');
+
+    useEffect(() => {
+        if (userData !== null) {
+            setName(userData?.name || '');
+            setEmail(userData?.email || '');
+            setGender(userData?.gender || '');
+            setBirthDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
+            setTelephone(userData?.telephone || '');
+            setPhotoLink(userData?.photoLink || '');
+            setFileList(userData?.photoLink ? [{
+                uid: userData?._id,
+                name: userData?.name,
+                status: 'done',
+                url: userData?.photoLink,
+            },] : []);
+        }
+    }, [userData]);
+
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -47,7 +71,39 @@ const AdminFormProfile = () => {
         setPreviewImage(file.url || file.preview);
         setPreviewOpen(true);
     };
+
+    // Fungsi untuk menangani perubahan file upload
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+    // Custom request untuk upload gambar dan simpan URL ke photoLink
+    const handleCustomRequest = async ({ file, onSuccess, onError }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post('https://backend-pst.vercel.app/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data && response.data.url) {
+                // Simpan URL gambar di photoLink
+                setPhotoLink(response.data.url);
+                message.success('Upload successful!');
+                onSuccess(response.data);
+            } else {
+                message.error('Upload failed!');
+                onError('No URL in response');
+            }
+        } catch (error) {
+            message.error('Error uploading file');
+            onError(error);
+        }
+    };
+
+
+    // Tombol upload gambar
     const uploadButton = (
         <button
             style={{
@@ -58,30 +114,10 @@ const AdminFormProfile = () => {
             className="flex flex-col gap-2 justify-center items-center font-openSans text-[12px]"
         >
             <PlusOutlined />
-
-            Upload <br />  Foto Anda
+            Upload <br /> Foto Anda
         </button>
     );
 
-
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [genders, setGender] = useState('');
-    const [birthDate, setBirthDate] = useState(null);
-    const [telephone, setTelephone] = useState('');
-    const [image, setImage] = useState(null); // State untuk menyimpan file gambar
-    const [imageStatus, setImageStatus] = useState('nonActive'); // Status upload gambar
-
-
-    useEffect(() => {
-        if (userData !== null) {
-            setName(userData?.name || '');
-            setEmail(userData?.email || '');
-            setGender(userData?.gender || '');
-            setBirthDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
-            setTelephone(userData?.telephone || '');
-        }
-    }, [userData]);
 
     // Status Validasi
     const nameStatus = useMemo(() => {
@@ -120,7 +156,8 @@ const AdminFormProfile = () => {
             email: email,
             gender: genders,
             birthDate: formatDate(birthDate),
-            telephone: telephone
+            telephone: telephone,
+            photoLink: photoLink
         };
 
         console.log("Updated User Data:", updatedUserData);
@@ -153,8 +190,9 @@ const AdminFormProfile = () => {
                 <Stack>
                     <div className="flex flex-col gap-3 justify-center items-center">
                         <Upload
-                            action="https://backend-pst.vercel.app/upload"
+                            customRequest={handleCustomRequest}
                             listType="picture-circle"
+                            fileList={fileList}
                             onPreview={handlePreview}
                             onChange={handleChange}
                         >

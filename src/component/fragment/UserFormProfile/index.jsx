@@ -58,6 +58,8 @@ const UserFormProfile = () => {
     const [telephone, setTelephone] = useState('');
     const [subsdistrictsTouched, setSubsdistrictsTouched] = useState(false);
     const [photoLink, setPhotoLink] = useState('');
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
 
 
     useEffect(() => {
@@ -80,7 +82,7 @@ const UserFormProfile = () => {
                 name: userData?.name,
                 status: 'done',
                 url: userData?.photoLink,
-              },] : []);
+            },] : []);
         }
     }, [userData]);
 
@@ -244,15 +246,17 @@ const UserFormProfile = () => {
         try {
             const response = await axiosInstance.patch(`/users/${userData._id}`, updatedUserData);
             console.log("User data updated successfully:", response.data);
+            setMessage('Profile Anda berhasil diperbaharui');
+            setMessageType('success');
         } catch (error) {
             console.error("Error updating user data:", error);
+            setMessage('Profile Anda gagal diperbarui. Silakan coba lagi.');
+            setMessageType('error');
         }
     }
 
     const isButtonDisabled = useMemo(() => {
         return (
-            // nameStatus === "nonActive" || nameStatus === "danger" ||
-            // emailStatus === "nonActive" || emailStatus === "danger" ||
             genderStatus === "nonActive" || genderStatus === "danger" ||
             birthDateStatus === "nonActive" || birthDateStatus === "danger" ||
             telephoneStatus === "nonActive" || telephoneStatus === "danger" ||
@@ -460,6 +464,11 @@ const UserFormProfile = () => {
                             <Button variant='ghost' colorScheme='bluePrimary' className="text-nonActive border-2 hover:bg-bluePrimary hover:text-white gap-2" style={{ borderRadius: "20px", width: '110px' }} isDisabled={isButtonDisabled} onClick={handlePerbaruiButtonClick}>
                                 Perbaharui
                             </Button>
+                            {message && (
+                                <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                                    <p>{message}</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </Stack>
