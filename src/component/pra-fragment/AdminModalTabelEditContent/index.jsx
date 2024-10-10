@@ -152,65 +152,61 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
-            <div className="flex flex-col gap-3 w-full mx-[12%]">
-                {/* <Input
-                    label="Image URL"
-                    variant="bordered"
-                    className="w-full"
-                    value={imageValue}
-                    onChange={handleInputChange(setImageValue)}
-                    color={imageStatus}
-                    isRequired
-                /> */}
-                <Upload
-                    customRequest={handleCustomRequest}
-                    listType="picture-circle"
-                    fileList={fileList}
-                    onPreview={handlePreview}
-                    onChange={handleChange}
-                >
-                    {fileList.length >= 1 ? null : uploadButton}
-                </Upload>
-                {previewImage && (
-                    <Image
-                        wrapperStyle={{
-                            display: 'none',
-                        }}
-                        preview={{
-                            visible: previewOpen,
-                            onVisibleChange: (visible) => setPreviewOpen(visible),
-                            afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                        }}
-                        src={previewImage}
+            <div className="flex gap-3 w-full mx-[12%] justify-center items-center">
+                <div className="flex-none w-[30%] p-2 ">
+                    <Upload
+                        customRequest={handleCustomRequest}
+                        listType="picture-circle"
+                        fileList={fileList}
+                        onPreview={handlePreview}
+                        onChange={handleChange}
+                    >
+                        {fileList.length >= 1 ? null : uploadButton}
+                    </Upload>
+                    {previewImage && (
+                        <Image
+                            wrapperStyle={{
+                                display: 'none',
+                            }}
+                            preview={{
+                                visible: previewOpen,
+                                onVisibleChange: (visible) => setPreviewOpen(visible),
+                                afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                            }}
+                            src={previewImage}
+                        />
+                    )}
+                </div>
+                <div className="flex-none w-[70%] p-2">
+                    <Input
+                        label="Judul"
+                        variant="bordered"
+                        className="w-full"
+                        value={titleValue}
+                        onChange={handleInputChange(setTitleValue)}
+                        color={titleStatus}
+                        isRequired
                     />
-                )}
-                <Input
-                    label="Judul"
-                    variant="bordered"
-                    className="w-full"
-                    value={titleValue}
-                    onChange={handleInputChange(setTitleValue)}
-                    color={titleStatus}
-                    isRequired
-                />
-                <Input
-                    label="Deskripsi"
-                    variant="bordered"
-                    className="w-full"
-                    value={contentValue}
-                    onChange={handleInputChange(setContentValue)}
-                    color={contentStatus}
-                    isRequired
-                />
-                <Input
-                    label="Link"
-                    variant="bordered"
-                    className="w-full"
-                    value={linkValue}
-                    onChange={handleInputChange(setLinkValue)}
-                    color={linkStatus}
-                    isRequired
-                />
+                    <Input
+                        label="Deskripsi"
+                        variant="bordered"
+                        className="w-full"
+                        value={contentValue}
+                        onChange={handleInputChange(setContentValue)}
+                        color={contentStatus}
+                        isRequired
+                    />
+                    <Input
+                        label="Link"
+                        variant="bordered"
+                        className="w-full"
+                        value={linkValue}
+                        onChange={handleInputChange(setLinkValue)}
+                        color={linkStatus}
+                        isRequired
+                    />
+                </div>
+
             </div>
 
             <Button
