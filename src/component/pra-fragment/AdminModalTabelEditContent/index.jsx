@@ -152,8 +152,8 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
-            <div className="flex  w-full mx-[12%] justify-center items-center">
-                <div className="flex-none w-[30%] justify-center items-center">
+            <div className="flex w-full mx-[12%] justify-center items-start"> {/* Mengubah items-center menjadi items-start */}
+                <div className="flex-none w-[30%] flex flex-col items-center"> {/* Menambahkan flex dan items-center untuk kolom pertama */}
                     <Upload
                         customRequest={handleCustomRequest}
                         listType="picture-circle"
@@ -177,7 +177,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
                         />
                     )}
                 </div>
-                <div className="flex-none gap-3 w-[70%] ">
+                <div className="flex-none w-[70%] flex flex-col gap-3 items-center"> {/* Menambahkan flex dan items-center untuk kolom kedua */}
                     <Input
                         label="Judul"
                         variant="bordered"
@@ -206,8 +206,8 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
                         isRequired
                     />
                 </div>
-
             </div>
+
 
             <Button
                 variant="ghost"
