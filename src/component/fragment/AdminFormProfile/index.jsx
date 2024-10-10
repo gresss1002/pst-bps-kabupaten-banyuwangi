@@ -402,7 +402,7 @@ const AdminFormProfile = () => {
                         Perbaharui
                     </Button>
                     {messages && (
-                                <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
                                     <p>{messages}</p>
                                 </div>
                             )}
