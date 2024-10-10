@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Button, Stack } from "@chakra-ui/react";
-import { DatePicker, Input, Select, SelectItem} from "@nextui-org/react";
+import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
-import {  gender, position, field, available} from "../../../data";
+import { gender, position, field, available } from "../../../data";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, Upload } from 'antd';
+import { Image, message, Upload } from 'antd';
 import axiosInstance from "../../../utils/axiosInstance";
 import formatDate from "../../../utils/formatedDate";
 import convertToISODate from "../../../utils/convertToISODate";
+import axios from "axios";
 // import { formatDate } from "react-birthDatepicker/dist/birthDate_utils";
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -38,32 +39,10 @@ const KonsultanFormProfile = () => {
         }
     };
 
-    
+
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
-    const handlePreview = async (file) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
-        }
-        setPreviewImage(file.url || file.preview);
-        setPreviewOpen(true);
-    };
-    const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
-    const uploadButton = (
-        <button
-            style={{
-                border: 0,
-                background: 'none',
-            }}
-            type="button"
-            className="flex flex-col gap-2 justify-center items-center font-openSans text-[12px]"
-        >
-            <PlusOutlined />
-            
-                Upload <br/>  Foto Anda
-        </button>
-    );
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [genders, setGender] = useState('');
@@ -72,12 +51,13 @@ const KonsultanFormProfile = () => {
     // const [kabupatenFiltered, setKabupatenFiltered] = useState([]);
     const [positions, setPosition] = useState('');
     const [fields, setField] = useState([]); // Ganti dari 'new Set([])' menjadi array kosong
-const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' untuk inisialisasi state 'availables'
+    const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' untuk inisialisasi state 'availables'
     const [birthDate, setDate] = useState(null);
     const [telepon, setTelepon] = useState('');
+    const [photoLink, setPhotoLink] = useState('');
     // const [kabupatenTouched, setKabupatenTouched] = useState(false);
-    const [image, setImage] = useState(null); // State untuk menyimpan file gambar
-    const [imageStatus, setImageStatus] = useState('nonActive'); // Status upload gambar
+    // const [image, setImage] = useState(null); // State untuk menyimpan file gambar
+    // const [imageStatus, setImageStatus] = useState('nonActive'); // Status upload gambar
 
 
     useEffect(() => {
@@ -93,8 +73,69 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
             // setPendidikan(userData?.education || '');
             // setBirthDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
             setTelepon(userData?.telephone || '');
+            setPhotoLink(userData?.photoLink || '');
+            setFileList(userData?.photoLink ? [{
+                uid: userData?._id,
+                name: userData?.name,
+                status: 'done',
+                url: userData?.photoLink,
+            },] : []);
         }
     }, [userData]);
+
+    const handlePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
+    };
+
+    // Fungsi untuk menangani perubahan file upload
+    const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+    // Custom request untuk upload gambar dan simpan URL ke photoLink
+    const handleCustomRequest = async ({ file, onSuccess, onError }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post('https://backend-pst.vercel.app/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data && response.data.url) {
+                // Simpan URL gambar di photoLink
+                setPhotoLink(response.data.url);
+                message.success('Upload successful!');
+                onSuccess(response.data);
+            } else {
+                message.error('Upload failed!');
+                onError('No URL in response');
+            }
+        } catch (error) {
+            message.error('Error uploading file');
+            onError(error);
+        }
+    };
+
+
+    // Tombol upload gambar
+    const uploadButton = (
+        <button
+            style={{
+                border: 0,
+                background: 'none',
+            }}
+            type="button"
+            className="flex flex-col gap-2 justify-center items-center font-openSans text-[12px]"
+        >
+            <PlusOutlined />
+            Upload <br /> Foto Anda
+        </button>
+    );
 
     // Status Validasi
     const nameStatus = useMemo(() => {
@@ -115,7 +156,7 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
         return "danger";
     }, [genders]);
 
-    
+
     const positionStatus = useMemo(() => {
         if (positions === "") return "nonActive";
         if (positions !== "") return "success";
@@ -123,17 +164,17 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
     }, [positions]);
 
     const fieldStatus = useMemo(() => {
-        return fields.length > 0 ? "success" : "nonActive"; 
+        return fields.length > 0 ? "success" : "nonActive";
     }, [fields]);
-    
+
     const availableStatus = useMemo(() => {
-        return availables.length > 0 ? "success" : "nonActive"; 
+        return availables.length > 0 ? "success" : "nonActive";
     }, [availables]);
 
 
     const birthDateStatus = useMemo(() => {
         if (birthDate === null) return "nonActive";
-        if (birthDate !== null ) return "success";
+        if (birthDate !== null) return "success";
         return "danger";
     }, [birthDate]);
 
@@ -152,14 +193,15 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
             telephone: telepon,
             position: positions,
             field: fields,
-            available: availables
+            available: availables,
+            photoLink: photoLink
         };
-    
+
         console.log("Updated User Data:", updatedUserData);
-    
+
         updateUserData(updatedUserData);
     }
-    
+
 
     const updateUserData = async (updatedUserData) => {
         try {
@@ -179,7 +221,7 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
             teleponStatus === "nonActive" || teleponStatus === "danger" ||
             positionStatus === "nonActive" || positionStatus === "danger" ||
             fieldStatus === "nonActive" || fieldStatus === "danger" ||
-            availableStatus === "nonActive" || availableStatus === "danger" 
+            availableStatus === "nonActive" || availableStatus === "danger"
         );
     }, [nameStatus, emailStatus, genderStatus, birthDateStatus, teleponStatus, positionStatus, fieldStatus, availableStatus]);
 
@@ -190,8 +232,9 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
                 <Stack>
                     <div className="flex flex-col gap-3 justify-center items-center">
                         <Upload
-                            action="https://backend-pst.vercel.app/upload"
+                            customRequest={handleCustomRequest}
                             listType="picture-circle"
+                            fileList={fileList}
                             onPreview={handlePreview}
                             onChange={handleChange}
                         >
@@ -269,7 +312,7 @@ const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' un
                             value={birthDate}
                         />
 
-                        
+
                         <Select
                             label="Jabatan"
                             className="w-full"

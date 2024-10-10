@@ -307,7 +307,7 @@ const UserFormProfile = () => {
                             />
                         )}
                         {/* Display the photoLink URL */}
-                        {photoLink && <p>Photo URL: {photoLink}</p>}
+                        {/* {photoLink && <p>Photo URL: {photoLink}</p>} */}
 
                         <Input
                             value={name}
