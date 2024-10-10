@@ -2,14 +2,29 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@chakra-ui/react";
 import { Input } from "@nextui-org/react";
 import axiosInstance from "../../../utils/axiosInstance";
+import { PlusOutlined } from '@ant-design/icons';
+import { Image, message, Upload } from "antd";
+import axios from "axios";
 
-const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
+
+const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
+
+const AdminModalTabelEditContent = ({ swiper, onUpdate = () => { } }) => {
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [fileList, setFileList] = useState([]);
     const [imageValue, setImageValue] = useState("");
     const [contentValue, setContentValue] = useState("");
     const [titleValue, setTitleValue] = useState("");
     const [linkValue, setLinkValue] = useState("");
-    const [message, setMessage] = useState("");
-    const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+    const [messages, setMessages] = useState('');
+    const [messagesType, setMessagesType] = useState(''); // 'success' or 'error'
 
     useEffect(() => {
         if (swiper) {
@@ -17,8 +32,68 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
             setContentValue(swiper.content || "");
             setTitleValue(swiper.title || "");
             setLinkValue(swiper.link || "");
+            setFileList(swiper?.image ? [{
+                uid: swiper?._id,
+                name: swiper?.title,
+                status: 'done',
+                url: swiper?.image,
+            },] : []);
         }
     }, [swiper]);
+
+    const handlePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
+    };
+
+    // Fungsi untuk menangani perubahan file upload
+    const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+    // Custom request untuk upload gambar dan simpan URL ke photoLink
+    const handleCustomRequest = async ({ file, onSuccess, onError }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post('https://backend-pst.vercel.app/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data && response.data.url) {
+                // Simpan URL gambar di photoLink
+                setImageValue(response.data.url);
+                message.success('Upload successful!');
+                onSuccess(response.data);
+            } else {
+                message.error('Upload failed!');
+                onError('No URL in response');
+            }
+        } catch (error) {
+            message.error('Error uploading file');
+            onError(error);
+        }
+    };
+
+
+    // Tombol upload gambar
+    const uploadButton = (
+        <button
+            style={{
+                border: 0,
+                background: 'none',
+            }}
+            type="button"
+            className="flex flex-col gap-2 justify-center items-center font-openSans text-[12px]"
+        >
+            <PlusOutlined />
+            Upload <br /> Foto Anda
+        </button>
+    );
 
     const handleInputChange = (setter) => (e) => {
         setter(e.target.value);
@@ -31,8 +106,8 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
 
         if (!swiper || !swiper._id) {
             console.error("Swiper id is missing.");
-            setMessage("Gagal mengubah data. ID swiper tidak ditemukan.");
-            setMessageType("error");
+            setMessages("Gagal mengubah data. ID swiper tidak ditemukan.");
+            setMessagesType("error");
             return;
         }
 
@@ -47,13 +122,13 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
             const response = await axiosInstance.put(`/swiper/${swiper._id}`, updatedData);
 
             console.log("Swiper updated successfully:", response.data);
-            setMessage("Data berhasil diperbarui!");
-            setMessageType("success");
+            setMessages("Data berhasil diperbarui!");
+            setMessagesType("success");
             onUpdate(response.data); // Notify parent component
         } catch (error) {
             console.error("Error updating swiper:", error);
-            setMessage("Gagal mengubah data. Silakan coba lagi.");
-            setMessageType("error");
+            setMessages("Gagal mengubah data. Silakan coba lagi.");
+            setMessagesType("error");
         }
     };
 
@@ -67,7 +142,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
             imageStatus === "danger" ||
             contentStatus === "danger" ||
             titleStatus === "danger" ||
-            linkStatus === "danger"||
+            linkStatus === "danger" ||
             imageStatus === "nonActive" ||
             contentStatus === "nonActive" ||
             titleStatus === "nonActive" ||
@@ -78,7 +153,7 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
             <div className="grid grid-cols-2 gap-3 w-full mx-[12%]">
-                <Input
+                {/* <Input
                     label="Image URL"
                     variant="bordered"
                     className="w-full"
@@ -86,7 +161,29 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
                     onChange={handleInputChange(setImageValue)}
                     color={imageStatus}
                     isRequired
-                />
+                /> */}
+                <Upload
+                    customRequest={handleCustomRequest}
+                    listType="picture-circle"
+                    fileList={fileList}
+                    onPreview={handlePreview}
+                    onChange={handleChange}
+                >
+                    {fileList.length >= 1 ? null : uploadButton}
+                </Upload>
+                {previewImage && (
+                    <Image
+                        wrapperStyle={{
+                            display: 'none',
+                        }}
+                        preview={{
+                            visible: previewOpen,
+                            onVisibleChange: (visible) => setPreviewOpen(visible),
+                            afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                        }}
+                        src={previewImage}
+                    />
+                )}
                 <Input
                     label="Judul"
                     variant="bordered"
@@ -127,9 +224,9 @@ const AdminModalTabelEditContent = ({ swiper, onUpdate = () => {} }) => {
                 Perbaharui
             </Button>
 
-            {message && (
-                <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                    <p>{message}</p>
+            {messages && (
+                <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                    <p>{messages}</p>
                 </div>
             )}
         </div>
