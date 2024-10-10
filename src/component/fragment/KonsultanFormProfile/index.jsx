@@ -55,8 +55,8 @@ const KonsultanFormProfile = () => {
     const [birthDate, setDate] = useState(null);
     const [telepon, setTelepon] = useState('');
     const [photoLink, setPhotoLink] = useState('');
-    const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
+    const [messages, setMessages] = useState('');
+    const [messagesType, setMessagesType] = useState('');
 
     // const [kabupatenTouched, setKabupatenTouched] = useState(false);
     // const [image, setImage] = useState(null); // State untuk menyimpan file gambar
@@ -210,12 +210,12 @@ const KonsultanFormProfile = () => {
         try {
             const response = await axiosInstance.patch(`/users/${userData._id}`, updatedUserData);
             console.log("User data updated successfully:", response.data);
-            setMessage('Profile berhasil diperbaharui');
-            setMessageType('success');
+            setMessages('Profile berhasil diperbaharui');
+            setMessagesType('success');
         } catch (error) {
             console.error("Error updating user data:", error);
-            setMessage('Profile gagal diperbarui. Silakan coba lagi.');
-            setMessageType('error');
+            setMessages('Profile gagal diperbarui. Silakan coba lagi.');
+            setMessagesType('error');
         }
     }
 
@@ -396,9 +396,9 @@ const KonsultanFormProfile = () => {
                     <Button variant='ghost' colorScheme='bluePrimary' className="text-nonActive border-2 hover:bg-bluePrimary hover:text-white gap-2" style={{ borderRadius: "20px", width: '110px' }} isDisabled={isButtonDisabled} onClick={handlePerbaruiButtonClick}>
                         Perbaharui
                     </Button>
-                    {message && (
-                                <div className={`text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                                    <p>{message}</p>
+                    {messages && (
+                                <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                                    <p>{messages}</p>
                                 </div>
                             )}
                 </div>
