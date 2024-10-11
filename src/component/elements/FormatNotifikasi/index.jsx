@@ -9,10 +9,10 @@ const FormatNotifikasi = ({ reservasi, ModalNotifkasiComponent }) => {
 
     if (reservasi.status === 'Disetujui') {
         statusMessage = 'disetujui';
-    } else if (reservasi.status === 'Diubah Konsultan') {
-        statusMessage = 'diubah oleh konsultan';
-    } else if (reservasi.status === 'Diubah Admin') {
-        statusMessage = 'diubah oleh admin';
+    } else if (reservasi.status === 'Disetujui Konsultan') {
+        statusMessage = 'disetujui oleh konsultan';
+    } else if (reservasi.status === 'Disetujui Admin') {
+        statusMessage = 'disetujui oleh admin';
     }
 
     // Format topics array or single topic

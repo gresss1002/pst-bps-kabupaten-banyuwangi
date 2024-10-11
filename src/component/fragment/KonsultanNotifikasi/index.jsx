@@ -6,39 +6,35 @@ import axios from "axios";
 import axiosInstance from "../../../utils/axiosInstance";
 
 const KonsultanNotifikasi = () => {
-    const [userData, setUserData] = useState(null); // State for storing user data
-    const userLocal = JSON.parse(localStorage.getItem('user')); // Getting user from localStorage
+    const [userData, setUserData] = useState(null);
+    const userLocal = JSON.parse(localStorage.getItem('user'));
     const [reservasi, setReservasi] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [idKonsultan, setIdKonsultan] = useState(''); 
+    const [idKonsultan, setIdKonsultan] = useState('');
 
-    // Fetch user data from API
     useEffect(() => {
         const getUserData = async () => {
             try {
-                const userLocal = JSON.parse(localStorage.getItem('user')); // Getting user from localStorage
                 const response = await axiosInstance.get(`/users/google/${userLocal.googleId}`);
                 const userData = response.data.user;
                 console.log('User data:', userData);
-                setUserData(userData); // Set user data after fetching
+                setUserData(userData);
             } catch (error) {
                 console.error('Error fetching user data:', error);
-                setError(error); // Set error if fetching user data fails
+                setError(error);
             }
         };
 
-        getUserData(); // Call the function to fetch user data
-    }, []); // Empty dependency array ensures this runs only once
+        getUserData();
+    }, []);
 
-    // Set idKonsultan when userData is available
     useEffect(() => {
         if (userData) {
-            setIdKonsultan(userData._id); // Set the idKonsultan from userData
+            setIdKonsultan(userData._id);
         }
-    }, [userData]); 
+    }, [userData]);
 
-    // Fetch reservations based on idKonsultan
     useEffect(() => {
         const fetchReservasi = async () => {
             if (!idKonsultan) return;
@@ -58,46 +54,47 @@ const KonsultanNotifikasi = () => {
         };
 
         fetchReservasi();
-    }, [idKonsultan]); // Re-fetch if idKonsultan changes
+    }, [idKonsultan]);
 
     const handleEditClick = (reservasi) => {
-        // Implement the logic for handleEditClick
         console.log("Edit clicked for:", reservasi);
     };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
 
+    const sortedReservasi = reservasi
+        .filter(rsv => 
+            rsv.status === 'Disetujui' || 
+            rsv.status === 'Disetujui Admin' || 
+            rsv.status === 'Disetujui Konsultan'
+        )
+        .sort((a, b) => new Date(b.tglReservasi) - new Date(a.tglReservasi)); // Sort by date descending
+
     return (
         <div className="flex flex-col gap-2">
-            {reservasi.length === 0 ? (
+            {sortedReservasi.length === 0 ? (
                 <p>No reservations found.</p>
             ) : (
-                reservasi
-                    .filter(rsv => 
-                        rsv.status === 'Disetujui' || 
-                        rsv.status === 'Diubah Admin' || 
-                        rsv.status === 'Diubah Konsultan'
-                    )
-                    .map(rsv => (
-                        <Card
-                            key={rsv._id} // Use _id as key if it's available
-                            style={{
-                                border: "1px solid #f0f0f0",
-                                borderRadius: "15px",
-                                width: "100%",
-                                backgroundColor: rsv.status === 'Disetujui' ? '#68b92e' : '#ea8b1c'
-                            }}
-                            onClick={() => handleEditClick(rsv)}
-                        >
-                            <CardBody>
-                                <FormatNotifikasi 
-                                    reservasi={rsv} 
-                                    ModalNotifkasiComponent={KonsultanModalNotifikasi} 
-                                />
-                            </CardBody>
-                        </Card>
-                    ))
+                sortedReservasi.map(rsv => (
+                    <Card
+                        key={rsv._id}
+                        style={{
+                            border: "1px solid #f0f0f0",
+                            borderRadius: "15px",
+                            width: "100%",
+                            backgroundColor: rsv.status === 'Disetujui Konsultan' ? '#68b92e' : '#ea8b1c'
+                        }}
+                        onClick={() => handleEditClick(rsv)}
+                    >
+                        <CardBody>
+                            <FormatNotifikasi 
+                                reservasi={rsv} 
+                                ModalNotifkasiComponent={KonsultanModalNotifikasi} 
+                            />
+                        </CardBody>
+                    </Card>
+                ))
             )}
         </div>
     );

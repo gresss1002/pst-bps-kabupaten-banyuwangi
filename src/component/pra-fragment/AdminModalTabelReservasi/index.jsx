@@ -187,7 +187,7 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     genderValue !== currentReservation.gender;
                 selectedKonsultan !== currentReservation.konsultan;
 
-                const newStatus = linkChanged && !otherChanges ? "Disetujui" : "Diubah Admin";
+                const newStatus = linkChanged && !otherChanges ? "Disetujui" : "Disetujui Admin";
 
                 try {
                     const updateResponse = await axios.put(`https://backend-pst.vercel.app/reservasi/${reservasi._id}`, { ...data, status: newStatus });

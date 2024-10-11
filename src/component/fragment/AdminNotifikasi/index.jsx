@@ -42,8 +42,8 @@ const AdminNotifikasi = () => {
                 reservasi
                     .filter(rsv => 
                         rsv.status === 'Disetujui' || 
-                        rsv.status === 'Diubah Admin' || 
-                        rsv.status === 'Diubah Konsultan'
+                        rsv.status === 'Disetujui Admin' || 
+                        rsv.status === 'Disetujui Konsultan'
                     )
                     .map(rsv => (
                         <Card
@@ -52,7 +52,7 @@ const AdminNotifikasi = () => {
                                 border: "1px solid #f0f0f0",
                                 borderRadius: "15px",
                                 width: "100%",
-                                backgroundColor: rsv.status === 'Disetujui' ? '#68b92e' : '#ea8b1c'
+                                backgroundColor: rsv.status === 'Disetujui Konsultan' ? '#68b92e' : '#ea8b1c'
                             }}
                             onClick={() => handleEditClick(rsv)}
                         >

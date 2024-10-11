@@ -108,8 +108,8 @@ const KonsultanModalTabelReservasi = ({ reservasi }) => {
     //         return "Disetujui";
     //     }
     
-    //     // If there are any other changes, set status to "Diubah Konsultan"
-    //     return "Diubah Konsultan";
+    //     // If there are any other changes, set status to "Disetujui Konsultan"
+    //     return "Disetujui Konsultan";
     // };
     
     const handleButtonClick = async () => {
@@ -134,7 +134,7 @@ const KonsultanModalTabelReservasi = ({ reservasi }) => {
                     genderValue !== currentReservation.gender;
     
                 // Determine the new status
-                const newStatus = linkChanged && !otherChanges ? "Disetujui" : "Diubah Konsultan";
+                const newStatus = linkChanged && !otherChanges ? "Disetujui" : "Disetujui Konsultan";
     
                 const data = {
                     method: selectedMethod,
