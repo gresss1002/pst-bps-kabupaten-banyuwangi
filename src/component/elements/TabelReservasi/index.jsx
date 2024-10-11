@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@chakra-ui/react";
 import { Input, Modal, ModalHeader, ModalContent, ModalBody } from "@nextui-org/react";
-import { ConfigProvider, Table } from "antd";
+import { ConfigProvider, Table, notification } from "antd"; // Import notification from antd
 import { FaPen, FaTrash } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import "./styles.css";
-import convertToISODate from "../../../utils/convertToISODate";
 import formatDate from "../../../utils/formatedDate";
-import { parseDate } from "@internationalized/date";
-import dayjs from 'dayjs';
 
-const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
+const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent, onDelete }) => { // Accept onDelete as a prop
     const [filteredInfo, setFilteredInfo] = useState({});
     const [sortedInfo, setSortedInfo] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
@@ -19,14 +16,13 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
     const [selectedReservasi, setSelectedReservasi] = useState(null);
 
     useEffect(() => {
-        // Sort the data based on createAt in descending order
         const filtered = reservasi
             .map((item, index) => ({
                 ...item,
-                key: item.id || `key-${index}`, // Unique key
-                order: index, // Track creation order
+                key: item.id || `key-${index}`,
+                order: index,
             }))
-            .sort((a, b) => new Date(b.createAt) - new Date(a.createAt)); // Sort by createAt descending
+            .sort((a, b) => new Date(b.createAt) - new Date(a.createAt));
 
         setFilteredData(filtered);
     }, [reservasi]);
@@ -34,6 +30,14 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
     const handleEditClick = (reservasi) => {
         setSelectedReservasi(reservasi);
         onOpen();
+    };
+
+    const handleDeleteClick = (reservasi) => {
+        const confirmDelete = window.confirm("Apakah Anda yakin ingin menghapus reservasi ini?");
+        if (confirmDelete) {
+            onDelete(reservasi.id); // Call the delete function passed as a prop
+            notification.success({ message: 'Reservasi berhasil dihapus.' });
+        }
     };
 
     const handleCloseClick = () => {
@@ -46,8 +50,8 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
             title: "No",
             dataIndex: "order",
             key: "order",
-            sorter: (a, b) => a.order - b.order, // Sort by creation order
-            render: (text, record) => record.order + 1, // Display 1-based index
+            sorter: (a, b) => a.order - b.order,
+            render: (text, record) => record.order + 1,
             width: '10%',
         },
         {
@@ -100,7 +104,7 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
             render: (_, reservasi) => (
                 <div className="flex space-x-3 justify-center items-center">
                     <FaPen className="cursor-pointer md:text-sm hover:text-bluePrimary" onClick={() => handleEditClick(reservasi)} />
-                    <FaTrash className="cursor-pointer md:text-sm hover:text-red-600" />
+                    <FaTrash className="cursor-pointer md:text-sm hover:text-red-600" onClick={() => handleDeleteClick(reservasi)} />
                 </div>
             ),
             width: '10%',
