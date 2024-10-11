@@ -69,18 +69,24 @@ const UserNotifikasi = () => {
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to the start of the day
+
+    const sortedReservasi = reservasi
+        .filter(rsv => 
+            (rsv.status === 'Disetujui' || 
+             rsv.status === 'Disetujui Admin' || 
+             rsv.status === 'Disetujui Konsultan') &&
+            new Date(rsv.reservasiDate) >= today // Ensure the date is today or in the future
+        )
+        .sort((a, b) => new Date(b.reservasiDate) - new Date(a.reservasiDate)); // Sort by date descending
+
     return (
         <div className="flex flex-col gap-2">
-            {reservasi.length === 0 ? (
+            {sortedReservasi.length === 0 ? (
                 <p>No reservations found.</p>
             ) : (
-                reservasi
-                    .filter(rsv => 
-                        rsv.status === 'Disetujui' || 
-                        rsv.status === 'Disetujui Admin' || 
-                        rsv.status === 'Disetujui Konsultan'
-                    )
-                    .map(rsv => (
+                sortedReservasi.map(rsv => (
                         <Card
                             key={rsv._id} // Use _id as key if it's available
                             style={{
