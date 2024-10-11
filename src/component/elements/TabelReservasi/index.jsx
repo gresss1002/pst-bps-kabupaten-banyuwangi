@@ -37,10 +37,10 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent, onDelete }) =
         const confirmDelete = window.confirm("Apakah Anda yakin ingin menghapus reservasi ini?");
         if (confirmDelete) {
             try {
-                await axios.delete(`https://backend-pst.vercel.app/reservasi/${reservasi.id}`); // Update with your API route
+                await axios.delete(`https://backend-pst.vercel.app/reservasi/${reservasi._id}`); // Update with your API route
                 notification.success({ message: 'Reservasi berhasil dihapus.' });
                 // Optionally refresh the data or remove the deleted item from state
-                setFilteredData((prevData) => prevData.filter(item => item.id !== reservasi.id));
+                setFilteredData((prevData) => prevData.filter(item => item._id !== reservasi._id));
             } catch (error) {
                 notification.error({ message: 'Gagal menghapus reservasi.' });
                 console.error(error);
