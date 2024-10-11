@@ -1,5 +1,7 @@
 import { Button, useDisclosure } from "@chakra-ui/react";
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
+import formatDate from "../../../utils/formatedDate";
+import convertToISODate from "../../../utils/convertToISODate";
 // import UserModalNotifikasi from "../UserModalNotifikasi";
 
 const FormatNotifikasi = ({ reservasi, ModalNotifkasiComponent }) => {
@@ -31,7 +33,7 @@ const FormatNotifikasi = ({ reservasi, ModalNotifkasiComponent }) => {
     return (
         <>
             <p className="font-openSans text-[14px] hover:text-white" onClick={onOpen}>
-                Reservasi <span className="font-bold">{formattedTopics}</span> Anda pada <span className="font-bold">{reservasi.reservasiDate}</span> telah {statusMessage}.
+                Reservasi <span className="font-bold">{formattedTopics}</span> Anda pada <span className="font-bold">{convertToISODate(formatDate(reservasi.reservasiDate))}</span> telah {statusMessage}.
             </p>
 
             <Modal size="2xl" isOpen={isOpen} onClose={onClose} style={{ marginTop: '113px', width: "100%" }} >
