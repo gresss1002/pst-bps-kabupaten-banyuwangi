@@ -140,7 +140,7 @@ const AdminModalNotifikasi = ({ reservasi }) => {
                     value={detailReservasiData.topic || ""}
                     color={topicStatus}
                 />
-                <Input
+                {/* <Input
                     type="number"
                     label="Nomor Antrian"
                     variant="bordered"
@@ -148,7 +148,7 @@ const AdminModalNotifikasi = ({ reservasi }) => {
                     className="w-full"
                     value={detailReservasiData.queue || 0}
                     color={queueStatus}
-                />
+                /> */}
                 <Input
                     label="Link"
                     variant="bordered"

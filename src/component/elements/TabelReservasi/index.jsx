@@ -14,19 +14,20 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
     const [filteredInfo, setFilteredInfo] = useState({});
     const [sortedInfo, setSortedInfo] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
-    const [filteredData, setFilteredData] = useState(reservasi);
+    const [filteredData, setFilteredData] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedReservasi, setSelectedReservasi] = useState(null);
 
     useEffect(() => {
-        // Adding order property to track creation sequence
+        // Sort the data based on createAt in descending order
         const filtered = reservasi
             .map((item, index) => ({
                 ...item,
                 key: item.id || `key-${index}`, // Unique key
                 order: index, // Track creation order
             }))
-            .sort((a, b) => a.order - b.order); // Sort by creation order
+            .sort((a, b) => new Date(b.createAt) - new Date(a.createAt)); // Sort by createAt descending
+
         setFilteredData(filtered);
     }, [reservasi]);
 
@@ -71,7 +72,7 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
                 const timeA = new Date(1970, 0, 1, hoursA, minutesA);
                 const timeB = new Date(1970, 0, 1, hoursB, minutesB);
                 return timeA - timeB;
-            }, // Sorter for time
+            },
             sortOrder: sortedInfo.columnKey === "time" ? sortedInfo.order : null,
             width: '18%',
         },
@@ -89,15 +90,7 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent }) => {
             key: "status",
             sorter: (a, b) => a.status.length - b.status.length,
             sortOrder: sortedInfo.columnKey === "status" ? sortedInfo.order : null,
-            width: '20%',
-        },
-        {
-            title: "Antrian",
-            dataIndex: "queue",
-            key: "queue",
-            sorter: (a, b) => a.queue - b.queue,
-            sortOrder: sortedInfo.columnKey === "queue" ? sortedInfo.order : null,
-            width: '10%',
+            width: '30%',
         },
         {
             title: "Aksi",

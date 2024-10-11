@@ -104,7 +104,7 @@ const UserModalNotifikasi = ({ reservasi }) => {
                     value={detailReservasiData.topic ? detailReservasiData.topic.join(', ') : ""}
                     color={topicStatus}
                 />
-                <Input
+                {/* <Input
                     type="number"
                     label="Nomor Antrian"
                     variant="bordered"
@@ -112,7 +112,7 @@ const UserModalNotifikasi = ({ reservasi }) => {
                     className="w-full"
                     value={detailReservasiData.queue || 0}
                     color={queueStatus}
-                />
+                /> */}
                 <Input
                     label="Link"
                     variant="bordered"
