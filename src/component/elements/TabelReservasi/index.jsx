@@ -6,6 +6,7 @@ import { FaPen, FaTrash } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import "./styles.css";
 import formatDate from "../../../utils/formatedDate";
+import axios from "axios";
 
 const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent, onDelete }) => { // Accept onDelete as a prop
     const [filteredInfo, setFilteredInfo] = useState({});
@@ -32,14 +33,21 @@ const TabelReservasi = ({ reservasi, ModalTabelReservasiComponent, onDelete }) =
         onOpen();
     };
 
-    const handleDeleteClick = (reservasi) => {
+    const handleDeleteClick = async (reservasi) => {
         const confirmDelete = window.confirm("Apakah Anda yakin ingin menghapus reservasi ini?");
         if (confirmDelete) {
-            onDelete(reservasi.id); // Call the delete function passed as a prop
-            notification.success({ message: 'Reservasi berhasil dihapus.' });
+            try {
+                await axios.delete(`https://backend-pst.vercel.app/${reservasi.id}`); // Update with your API route
+                notification.success({ message: 'Reservasi berhasil dihapus.' });
+                // Optionally refresh the data or remove the deleted item from state
+                setFilteredData((prevData) => prevData.filter(item => item.id !== reservasi.id));
+            } catch (error) {
+                notification.error({ message: 'Gagal menghapus reservasi.' });
+                console.error(error);
+            }
         }
     };
-
+    
     const handleCloseClick = () => {
         setSelectedReservasi(null);
         onClose();
