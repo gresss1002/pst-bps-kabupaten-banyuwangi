@@ -41,8 +41,8 @@ const AdminPages = ({ userData }) => {
             <BarSumReservasi />
             <BarSumTopik />
             <DonutStatusReservasi />
-            <LineDayReservasi />
-            <SlopeDaysTopik />
+            {/* <LineDayReservasi /> */}
+            {/* <SlopeDaysTopik /> */}
         </div>
         },
         {
