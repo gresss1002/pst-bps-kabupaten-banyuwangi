@@ -69,7 +69,7 @@ const KonsultanNotifikasi = () => {
             rsv.status === 'Disetujui Admin' || 
             rsv.status === 'Disetujui Konsultan'
         )
-        .sort((a, b) => new Date(b.tglReservasi) - new Date(a.tglReservasi)); // Sort by date descending
+        .sort((a, b) => new Date(b.reservasiDate) - new Date(a.reservasiDate)); // Sort by date descending
 
     return (
         <div className="flex flex-col gap-2">
