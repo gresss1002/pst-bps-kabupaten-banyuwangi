@@ -119,15 +119,15 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
         };
 
         try {
-            const response = await axiosInstance.post(`https://backend-pst.vercel.app/swiper/${swiper._id}`, data);
+            const response = await axiosInstance.post(`https://backend-pst.vercel.app/swiper`, data);
 
             console.log("Swiper updated successfully:", response.data);
-            setMessages("Data berhasil diperbarui!");
+            setMessages("Data berhasil ditambah!");
             setMessagesType("success");
             onUpdate(response.data); // Notify parent component
         } catch (error) {
             console.error("Error updating swiper:", error);
-            setMessages("Gagal mengubah data. Silakan coba lagi.");
+            setMessages("Gagal menambah data. Silakan coba lagi.");
             setMessagesType("error");
         }
     };
