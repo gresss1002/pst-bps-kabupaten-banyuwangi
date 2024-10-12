@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Button } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { Input } from "@nextui-org/react";
 import axiosInstance from "../../../utils/axiosInstance";
 import { PlusOutlined } from '@ant-design/icons';
@@ -152,79 +152,85 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
 
     return (
         <div className="flex min-h-screen my-4 mx-2">
-            <div style={{width: '100%'}}>
-                <div className="flex flex-col gap-3 justify-center items-center w-fu" >
-                    <Upload
-                        customRequest={handleCustomRequest}
-                        listType="picture-circle"
-                        fileList={fileList}
-                        onPreview={handlePreview}
-                        onChange={handleChange}
-                    >
-                        {fileList.length >= 1 ? null : uploadButton}
-                    </Upload>
-                    {previewImage && (
-                        <Image
-                            wrapperStyle={{
-                                display: 'none',
-                            }}
-                            preview={{
-                                visible: previewOpen,
-                                onVisibleChange: (visible) => setPreviewOpen(visible),
-                                afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                            }}
-                            src={previewImage}
+            <div className="w-full">
+                <Stack>
+                    <div className="flex flex-col gap-3 justify-center items-center" >
+                        <Upload
+                            customRequest={handleCustomRequest}
+                            listType="picture-circle"
+                            fileList={fileList}
+                            onPreview={handlePreview}
+                            onChange={handleChange}
+                        >
+                            {fileList.length >= 1 ? null : uploadButton}
+                        </Upload>
+                        {previewImage && (
+                            <Image
+                                wrapperStyle={{
+                                    display: 'none',
+                                }}
+                                preview={{
+                                    visible: previewOpen,
+                                    onVisibleChange: (visible) => setPreviewOpen(visible),
+                                    afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                                }}
+                                src={previewImage}
+                            />
+                        )}
+                        {/* </div> */}
+                        {/* <div className="flex-none w-[75%] flex flex-col gap-3 items-center"> Menambahkan flex dan items-center untuk kolom kedua */}
+                        <Input
+                            label="Judul"
+                            type="text"
+                            variant="bordered"
+                            className="w-full"
+                            value={titleValue}
+                            onChange={handleInputChange(setTitleValue)}
+                            color={titleStatus}
+                            isRequired
                         />
-                    )}
-                    {/* </div> */}
-                    {/* <div className="flex-none w-[75%] flex flex-col gap-3 items-center"> Menambahkan flex dan items-center untuk kolom kedua */}
-                    <Input
-                        label="Judul"
-                        variant="bordered"
-                        className="w-full"
-                        value={titleValue}
-                        onChange={handleInputChange(setTitleValue)}
-                        color={titleStatus}
-                        isRequired
-                    />
-                    <Input
-                        label="Deskripsi"
-                        variant="bordered"
-                        className="w-full"
-                        value={contentValue}
-                        onChange={handleInputChange(setContentValue)}
-                        color={contentStatus}
-                        isRequired
-                    />
-                    <Input
-                        label="Link"
-                        variant="bordered"
-                        className="w-full"
-                        value={linkValue}
-                        onChange={handleInputChange(setLinkValue)}
-                        color={linkStatus}
-                        isRequired
-                    />
-                    {/* </div> */}
-                </div>
+                        <Input
+                            label="Deskripsi"
+                            type="text"
+                            variant="bordered"
+                            className="w-full"
+                            value={contentValue}
+                            onChange={handleInputChange(setContentValue)}
+                            color={contentStatus}
+                            isRequired
+                        />
+                        <Input
+                            label="Link"
+                            type="text"
+                            variant="bordered"
+                            className="w-full"
+                            value={linkValue}
+                            onChange={handleInputChange(setLinkValue)}
+                            color={linkStatus}
+                            isRequired
+                        />
+                        {/* </div> */}
+                    </div>
+                </Stack>
+
 
                 <div className="flex flex-col justify-center items-center h-[60px] text-[14px] gap-1 mt-2">
-                <Button
-                    variant="ghost"
-                    colorScheme="bluePrimary"
-                    className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white"
-                    style={{ borderRadius: "20px", width: "120px" }}
-                    onClick={handleButtonClick}
-                    isDisabled={isButtonDisabled}
-                >
-                    Buat
-                </Button>
+                    <Button
+                        variant="ghost"
+                        colorScheme="bluePrimary"
+                        className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white"
+                        style={{ borderRadius: "20px", width: "120px" }}
+                        onClick={handleButtonClick}
+                        isDisabled={isButtonDisabled}
+                    >
+                        Buat
+                    </Button>
 
-                {messages && (
-                    <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                        <p>{messages}</p>
-                    </div>
-                )}
+                    {messages && (
+                        <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                            <p>{messages}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
