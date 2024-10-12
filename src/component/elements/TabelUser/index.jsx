@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@chakra-ui/react";
 import { Input, Modal, ModalHeader, ModalContent, ModalBody } from "@nextui-org/react";
-import { ConfigProvider, Table } from "antd";
+import { ConfigProvider,  Table } from "antd";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import "./styles.css";
@@ -32,6 +32,7 @@ const TabelUser = ({ users, ModalTabelUserComponent, space }) => {
         setSelectedUser(user);
         onOpen();
     };
+
 
     const handleCloseClick = () => {
         setSelectedUser(null);
@@ -90,7 +91,7 @@ const TabelUser = ({ users, ModalTabelUserComponent, space }) => {
             render: (_, user) => (
                 <div className="flex space-x-3 justify-center items-center">
                     <FaPen className="cursor-pointer md:text-sm hover:text-bluePrimary" onClick={() => handleEditClick(user)} />
-                    <FaTrash className="cursor-pointer md:text-sm hover:text-red-600" />
+                    {/* <FaTrash className="cursor-pointer md:text-sm hover:text-red-600" /> */}
                 </div>
             ),
             width: '10%'

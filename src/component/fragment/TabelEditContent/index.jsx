@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useDisclosure } from "@chakra-ui/react";
 import { Input, Modal, ModalHeader, ModalContent, ModalBody } from "@nextui-org/react";
-import { ConfigProvider, Table } from "antd";
+import { ConfigProvider, notification, Table } from "antd";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import "./styles.css";
@@ -50,6 +50,22 @@ const TabelEditContent = () => {
     const handleEditClick = (swiper) => {
         setSelectedSwiper(swiper);
         onOpen();
+    };
+
+    
+    const handleDeleteClick = async (swiper) => {
+        const confirmDelete = window.confirm("Apakah Anda yakin ingin menghapus data ini?");
+        if (confirmDelete) {
+            try {
+                await axios.delete(`https://backend-pst.vercel.app/swiper/${swiper._id}`); // Update with your API route
+                notification.success({ message: 'Data berhasil dihapus.' });
+                // Optionally refresh the data or remove the deleted item from state
+                setFilteredData((prevData) => prevData.filter(item => item._id !== swiper._id));
+            } catch (error) {
+                notification.error({ message: 'Gagal menghapus data.' });
+                console.error(error);
+            }
+        }
     };
 
     const handleCloseClick = () => {
@@ -105,7 +121,7 @@ const TabelEditContent = () => {
             render: (_, swiper) => (
                 <div className="flex space-x-3 justify-center items-center">
                     <FaPen className="cursor-pointer md:text-sm hover:text-bluePrimary" onClick={() => handleEditClick(swiper)} />
-                    <FaTrash className="cursor-pointer md:text-sm hover:text-red-600" />
+                    <FaTrash className="cursor-pointer md:text-sm hover:text-red-600" onClick={() => handleDeleteClick(swiper)}/>
                 </div>
             ),
             width: '10%'
