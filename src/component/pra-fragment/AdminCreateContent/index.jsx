@@ -63,7 +63,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+ 
             if (response.data && response.data.url) {
                 // Simpan URL gambar di photoLink
                 setImageValue(response.data.url);
