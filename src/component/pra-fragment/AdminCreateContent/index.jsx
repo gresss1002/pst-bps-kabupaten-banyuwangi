@@ -1,11 +1,10 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@chakra-ui/react";
 import { Input } from "@nextui-org/react";
 import axiosInstance from "../../../utils/axiosInstance";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, message, notification, Upload } from "antd";
+import { Image, message, notification, Upload } from 'antd';
 import axios from "axios";
-
 
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -15,7 +14,7 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
+const AdminCreateContent = ({ onUpdate = () => {} }) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
@@ -26,21 +25,6 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
     const [messages, setMessages] = useState('');
     const [messagesType, setMessagesType] = useState(''); // 'success' or 'error'
 
-    // useEffect(() => {
-    //     if (swiper) {
-    //         setImageValue(swiper.image || "");
-    //         setContentValue(swiper.content || "");
-    //         setTitleValue(swiper.title || "");
-    //         setLinkValue(swiper.link || "");
-    //         setFileList(swiper?.image ? [{
-    //             uid: swiper?._id,
-    //             name: swiper?.title,
-    //             status: 'done',
-    //             url: swiper?.image,
-    //         },] : []);
-    //     }
-    // }, [swiper]);
-
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -49,10 +33,8 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
         setPreviewOpen(true);
     };
 
-    // Fungsi untuk menangani perubahan file upload
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
-    // Custom request untuk upload gambar dan simpan URL ke photoLink
     const handleCustomRequest = async ({ file, onSuccess, onError }) => {
         const formData = new FormData();
         formData.append('file', file);
@@ -65,7 +47,6 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
             });
 
             if (response.data && response.data.url) {
-                // Simpan URL gambar di photoLink
                 setImageValue(response.data.url);
                 notification.success('Upload successful!');
                 onSuccess(response.data);
@@ -79,14 +60,9 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
         }
     };
 
-
-    // Tombol upload gambar
     const uploadButton = (
         <button
-            style={{
-                border: 0,
-                background: 'none',
-            }}
+            style={{ border: 0, background: 'none' }}
             type="button"
             className="flex flex-col gap-2 justify-center items-center font-openSans text-[12px]"
         >
@@ -104,13 +80,6 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
             return;
         }
 
-        // if (!swiper || !swiper._id) {
-        //     console.error("Swiper id is missing.");
-        //     setMessages("Gagal menambah data.");
-        //     setMessagesType("error");
-        //     return;
-        // }
-
         const data = {
             link: linkValue,
             image: imageValue,
@@ -119,15 +88,14 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
         };
 
         try {
-            const response = await axiosInstance.post(`https://backend-pst.vercel.app/swiper/${swiper._id}`, data);
-
-            console.log("Swiper updated successfully:", response.data);
-            setMessages("Data berhasil diperbarui!");
+            const response = await axiosInstance.post(`https://backend-pst.vercel.app/swiper`, data);
+            console.log("Swiper created successfully:", response.data);
+            setMessages("Data berhasil ditambahkan!");
             setMessagesType("success");
             onUpdate(response.data); // Notify parent component
         } catch (error) {
-            console.error("Error updating swiper:", error);
-            setMessages("Gagal mengubah data. Silakan coba lagi.");
+            console.error("Error creating swiper:", error);
+            setMessages("Gagal menambah data. Silakan coba lagi.");
             setMessagesType("error");
         }
     };
@@ -153,8 +121,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
     return (
         <div className="flex min-h-screen my-4 mx-2">
             <div className="w-full">
-                <div className="flex flex-col gap-3 justify-center items-center"> {/* Mengubah items-center menjadi items-start */}
-                    {/* <div className="flex-none w-[25%] flex flex-col justify-center items-center"> Menambahkan flex dan items-center untuk kolom pertama */}
+                <div className="flex flex-col gap-3 justify-start items-start"> {/* Change items-center to items-start */}
                     <Upload
                         customRequest={handleCustomRequest}
                         listType="picture-circle"
@@ -166,9 +133,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                     </Upload>
                     {previewImage && (
                         <Image
-                            wrapperStyle={{
-                                display: 'none',
-                            }}
+                            wrapperStyle={{ display: 'none' }}
                             preview={{
                                 visible: previewOpen,
                                 onVisibleChange: (visible) => setPreviewOpen(visible),
@@ -177,12 +142,10 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                             src={previewImage}
                         />
                     )}
-                    {/* </div> */}
-                    {/* <div className="flex-none w-[75%] flex flex-col gap-3 items-center"> Menambahkan flex dan items-center untuk kolom kedua */}
                     <Input
                         label="Judul"
                         variant="bordered"
-                        className="w-full"
+                        className="w-full" // Ensure full width
                         value={titleValue}
                         onChange={handleInputChange(setTitleValue)}
                         color={titleStatus}
@@ -191,7 +154,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                     <Input
                         label="Deskripsi"
                         variant="bordered"
-                        className="w-full"
+                        className="w-full" // Ensure full width
                         value={contentValue}
                         onChange={handleInputChange(setContentValue)}
                         color={contentStatus}
@@ -200,35 +163,33 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                     <Input
                         label="Link"
                         variant="bordered"
-                        className="w-full"
+                        className="w-full" // Ensure full width
                         value={linkValue}
                         onChange={handleInputChange(setLinkValue)}
                         color={linkStatus}
                         isRequired
                     />
-                    {/* </div> */}
                 </div>
 
                 <div className="flex flex-col justify-center items-center h-[60px] text-[14px] gap-1 mt-2">
-                <Button
-                    variant="ghost"
-                    colorScheme="bluePrimary"
-                    className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white"
-                    style={{ borderRadius: "20px", width: "120px" }}
-                    onClick={handleButtonClick}
-                    isDisabled={isButtonDisabled}
-                >
-                    Buat
-                </Button>
+                    <Button
+                        variant="ghost"
+                        colorScheme="bluePrimary"
+                        className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white"
+                        style={{ borderRadius: "20px", width: "120px" }}
+                        onClick={handleButtonClick}
+                        isDisabled={isButtonDisabled}
+                    >
+                        Buat
+                    </Button>
 
-                {messages && (
-                    <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                        <p>{messages}</p>
-                    </div>
-                )}
+                    {messages && (
+                        <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                            <p>{messages}</p>
+                        </div>
+                    )}
                 </div>
             </div>
-
         </div>
     );
 };
