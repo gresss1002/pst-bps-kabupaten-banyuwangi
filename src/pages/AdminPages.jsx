@@ -13,6 +13,7 @@ import BarSumTopik from "../component/pra-fragment/BarSumTopik";
 import DonutStatusReservasi from "../component/pra-fragment/DonutStatusReservasi";
 import LineDayReservasi from "../component/pra-fragment/LineDayReservasi";
 import SlopeDaysTopik from "../component/pra-fragment/SlopeDaysTopik";
+import AdminTabsContent from "../component/fragment/AdminTabsContent";
 
 
 
@@ -71,7 +72,7 @@ const AdminPages = ({ userData }) => {
             title: 'Edit Beranda',
             subtitle: 'Ubah Konten Beranda',
             description: 'Anda dapat mengubah ataupun menghapus konten swiper pada beranda',
-            content: <TabelEditContent />
+            content: <AdminTabsContent />
         },
         // {
         //     key: 'riwayatPengaduan',
