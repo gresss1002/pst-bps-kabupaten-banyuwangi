@@ -151,9 +151,9 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
     }, [imageStatus, contentStatus, titleStatus, linkStatus]);
 
     return (
-        <div className="flex min-h-screen my-4 mx-2 w-full">
-            <div className="w-full">
-                <div className="flex flex-col gap-3 justify-center items-center w-full" >
+        <div className="flex min-h-screen my-4 mx-2">
+            <div style={{width: '100%'}}>
+                <div className="flex flex-col gap-3 justify-center items-center w-fu" >
                     <Upload
                         customRequest={handleCustomRequest}
                         listType="picture-circle"
