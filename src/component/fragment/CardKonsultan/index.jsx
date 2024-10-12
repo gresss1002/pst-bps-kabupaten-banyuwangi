@@ -70,7 +70,7 @@ const getUserData = async () => {
                         <Card key={konsultan._id} maxW='sm' style={{ border: "1px solid #f0f0f0", borderRadius: "20px" }} className="hover:bg-hoverActive">
                             <CardBody>
                                 <img
-                                    src={konsultan.image}
+                                    src={konsultan.photoLink}
                                     alt={konsultan.name}
                                     style={{ borderRadius: "18px", justifyItems: "center", alignItems: "center" }}
                                     className="w-full h-auto object-cover text-[12px] font-openSans"

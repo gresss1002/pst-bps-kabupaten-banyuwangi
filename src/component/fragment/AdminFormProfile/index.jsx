@@ -206,7 +206,7 @@ const AdminFormProfile = () => {
         <div className="flex min-h-screen my-4 mx-2">
             <div className="w-full">
                 <Stack>
-                    <div className="flex flex-col gap-3 justify-center items-center">
+                    <div className="flex flex-col gap-3 justify-center items-center ">
                         <Upload
                             customRequest={handleCustomRequest}
                             listType="picture-circle"

@@ -91,7 +91,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
             className="flex flex-col gap-2 justify-center items-center font-openSans text-[12px]"
         >
             <PlusOutlined />
-            Upload <br /> Foto Anda
+            Upload <br /> Foto Logo
         </button>
     );
 
@@ -151,10 +151,9 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
     }, [imageStatus, contentStatus, titleStatus, linkStatus]);
 
     return (
-        <div className="flex min-h-screen my-4 mx-2">
+        <div className="flex min-h-screen my-4 mx-2 w-full">
             <div className="w-full">
-                <div className="flex flex-col gap-3 justify-center items-center" style={{width: '100%'}}> {/* Mengubah items-center menjadi items-start */}
-                    {/* <div className="flex-none w-[25%] flex flex-col justify-center items-center"> Menambahkan flex dan items-center untuk kolom pertama */}
+                <div className="flex flex-col gap-3 justify-center items-center w-full" >
                     <Upload
                         customRequest={handleCustomRequest}
                         listType="picture-circle"
