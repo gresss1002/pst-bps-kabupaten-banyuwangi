@@ -67,14 +67,14 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
             if (response.data && response.data.url) {
                 // Simpan URL gambar di photoLink
                 setImageValue(response.data.url);
-                notification.success('Upload successful!');
+                notification.success({message:'Upload successful!'});
                 onSuccess(response.data);
             } else {
-                notification.error('Upload failed!');
+                notification.error({message:'Upload failed!'});
                 onError('No URL in response');
             }
         } catch (error) {
-            notification.error('Error uploading file');
+            notification.error({message:'Error uploading file'});
             onError(error);
         }
     };
