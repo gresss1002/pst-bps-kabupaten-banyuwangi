@@ -153,7 +153,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
     return (
         <div className="flex min-h-screen my-4 mx-2">
             <div className="w-full">
-                <div className="flex flex-col gap-3 justify-center items-center"> {/* Mengubah items-center menjadi items-start */}
+                <div className="flex flex-col gap-3 justify-center items-center" style={{width: '100%'}}> {/* Mengubah items-center menjadi items-start */}
                     {/* <div className="flex-none w-[25%] flex flex-col justify-center items-center"> Menambahkan flex dan items-center untuk kolom pertama */}
                     <Upload
                         customRequest={handleCustomRequest}
@@ -182,7 +182,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                     <Input
                         label="Judul"
                         variant="bordered"
-                        className="w-[100%]"
+                        className="w-full"
                         value={titleValue}
                         onChange={handleInputChange(setTitleValue)}
                         color={titleStatus}
@@ -191,7 +191,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                     <Input
                         label="Deskripsi"
                         variant="bordered"
-                        className="w-[100%]"
+                        className="w-full"
                         value={contentValue}
                         onChange={handleInputChange(setContentValue)}
                         color={contentStatus}
@@ -200,7 +200,7 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                     <Input
                         label="Link"
                         variant="bordered"
-                        className="w-[100%]"
+                        className="w-full"
                         value={linkValue}
                         onChange={handleInputChange(setLinkValue)}
                         color={linkStatus}
