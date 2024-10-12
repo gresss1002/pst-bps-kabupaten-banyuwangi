@@ -151,9 +151,10 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
     }, [imageStatus, contentStatus, titleStatus, linkStatus]);
 
     return (
-        <div className="flex min-h-screen my-4 mx-2 w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
-            <div className="flex flex-col gap-3 justify-center items-center"> {/* Mengubah items-center menjadi items-start */}
-                {/* <div className="flex-none w-[25%] flex flex-col justify-center items-center"> Menambahkan flex dan items-center untuk kolom pertama */}
+        <div className="flex min-h-screen my-4 mx-2">
+            <div className="w-full">
+                <div className="flex flex-col gap-3 justify-center items-center"> {/* Mengubah items-center menjadi items-start */}
+                    {/* <div className="flex-none w-[25%] flex flex-col justify-center items-center"> Menambahkan flex dan items-center untuk kolom pertama */}
                     <Upload
                         customRequest={handleCustomRequest}
                         listType="picture-circle"
@@ -176,8 +177,8 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                             src={previewImage}
                         />
                     )}
-                {/* </div> */}
-                {/* <div className="flex-none w-[75%] flex flex-col gap-3 items-center"> Menambahkan flex dan items-center untuk kolom kedua */}
+                    {/* </div> */}
+                    {/* <div className="flex-none w-[75%] flex flex-col gap-3 items-center"> Menambahkan flex dan items-center untuk kolom kedua */}
                     <Input
                         label="Judul"
                         variant="bordered"
@@ -205,26 +206,29 @@ const AdminCreateContent = ({ swiper, onUpdate = () => { } }) => {
                         color={linkStatus}
                         isRequired
                     />
-                {/* </div> */}
+                    {/* </div> */}
+                </div>
+
+                <div className="flex flex-col justify-center items-center h-[60px] text-[14px] gap-1 mt-2">
+                <Button
+                    variant="ghost"
+                    colorScheme="bluePrimary"
+                    className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white"
+                    style={{ borderRadius: "20px", width: "120px" }}
+                    onClick={handleButtonClick}
+                    isDisabled={isButtonDisabled}
+                >
+                    Buat
+                </Button>
+
+                {messages && (
+                    <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                        <p>{messages}</p>
+                    </div>
+                )}
+                </div>
             </div>
 
-
-            <Button
-                variant="ghost"
-                colorScheme="bluePrimary"
-                className="font-openSans text-[12px] text-nonActive border-2 hover:bg-bluePrimary hover:text-white"
-                style={{ borderRadius: "20px", width: "120px" }}
-                onClick={handleButtonClick}
-                isDisabled={isButtonDisabled}
-            >
-                Perbaharui
-            </Button>
-
-            {messages && (
-                <div className={`text-center ${messagesType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                    <p>{messages}</p>
-                </div>
-            )}
         </div>
     );
 };

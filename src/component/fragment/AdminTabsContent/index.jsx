@@ -6,12 +6,12 @@ import AdminCreateContent from "../../pra-fragment/AdminCreateContent";
 const tabsContent = [
     {
         key: '1',
-        label: 'Create',
+        label: 'Buat',
         children: <AdminCreateContent/>,
     },
     {
         key: '2',
-        label: 'Daftar',
+        label: 'Edit',
         children: <TabelEditContent />,
     },
 ];
