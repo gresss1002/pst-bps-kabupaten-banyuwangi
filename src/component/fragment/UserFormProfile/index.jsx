@@ -398,7 +398,7 @@ const UserFormProfile = () => {
                             label="Asal Kabupaten/Kota"
                             className="w-full"
                             variant="bordered"
-                            selectedKeys={[subsdistricts]}
+                            selectedKeys={[subsdistrictsFiltered]}
                             isInvalid={subsdistrictsStatus === "danger"}
                             color={subsdistrictsStatus}
                             errorMessage={subsdistrictsStatus === "danger" ? "Pilih Kecamatan telebih dahulu" : ""}
