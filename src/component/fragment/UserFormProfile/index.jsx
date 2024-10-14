@@ -51,7 +51,7 @@ const UserFormProfile = () => {
     const [genders, setGender] = useState('');
     const [districts, setDistricts] = useState('');
     const [subsdistricts, setSubsdistricts] = useState('');
-    // const [subsdistricts, setSubsdistricts] = useState([]);
+    const [subsdistrictsFiltered, setSubsdistrictsFiltered] = useState([]);
     const [works, setWork] = useState('');
     const [educations, setPendidikan] = useState('');
     const [birthDate, setBirthDate] = useState(null);
@@ -207,9 +207,9 @@ const UserFormProfile = () => {
         const selectedDistrict = district.find(d => d.value === districts);
         if (selectedDistrict) {
             const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
-            setSubsdistricts(filtered);
+            setSubsdistrictsFiltered(filtered);
         } else {
-            setSubsdistricts([]);
+            setSubsdistrictsFiltered([]);
         }
         setSubsdistricts("");
     }, [districts]);
@@ -269,15 +269,20 @@ const UserFormProfile = () => {
 
 
     useEffect(() => {
+        console.log('Districts:', districts);
+        console.log('Subsdistricts:', subsdistricts);
+        console.log('Subsdistricts Filtered:', subsdistrictsFiltered);
+
         const selectedDistrict = district.find(d => d.value === districts);
         if (selectedDistrict) {
             const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
-            setSubsdistricts(filtered);
+            setSubsdistrictsFiltered(filtered);
         } else {
-            setSubsdistricts([]);
+            setSubsdistrictsFiltered([]);
         }
+        // Optionally reset subsdistricts if needed
+        // setSubsdistricts("");
     }, [districts]);
-    
 
     return (
         <div className="flex min-h-screen my-4 mx-2">
@@ -399,7 +404,7 @@ const UserFormProfile = () => {
                             // value={subsdistricts}
                             isRequired
                         >
-                            {subsdistrict.map((sd) => (
+                            {subsdistrictsFiltered.map((sd) => (
                                 <SelectItem key={sd.value} value={sd.value}>
                                     {sd.value}
                                 </SelectItem>
