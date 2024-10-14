@@ -208,11 +208,17 @@ const UserFormProfile = () => {
         if (selectedDistrict) {
             const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
             setSubsdistrictsFiltered(filtered);
+    
+            // Reset subsdistricts if no matching subsdistricts are found
+            if (filtered.length === 0) {
+                setSubsdistricts(''); // or set it to a valid default value
+            }
         } else {
             setSubsdistrictsFiltered([]);
+            setSubsdistricts(''); // Reset if no district is selected
         }
-        setSubsdistricts("");
     }, [districts]);
+    
 
 
     const handleDistrictsChange = (value) => {
