@@ -100,10 +100,6 @@ const AdminModalTabelAdmin = ({ users }) => {
       nameStatus === "danger" ||
       emailStatus === "danger" ||
       genderStatus === "danger" ||
-      // districtsStatus === "danger" ||
-      // subsdistrictsStatus === "danger" ||
-      // workStatus === "danger" ||
-      // educationStatus === "danger" ||
       telephonesStatus === "danger" 
       // positionStatus === "danger" ||
       // fieldStatus === "danger" ||
