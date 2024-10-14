@@ -263,7 +263,7 @@ const KonsultanFormProfile = () => {
                             onChange={(e) => setName(e.target.value)}
                             className="w-full"
                             isRequired
-                            isReadOnly
+                            // isReadOnly
                         />
 
                         <Input
