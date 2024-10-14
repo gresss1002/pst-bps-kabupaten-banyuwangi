@@ -3,7 +3,7 @@ import { Button, Stack } from "@chakra-ui/react";
 import { DatePicker, Input, Select, SelectItem, Tooltip } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, message, Upload } from 'antd';
+import { Image, message, notification, Upload } from 'antd';
 import { gender } from "../../../data";
 import axiosInstance from "../../../utils/axiosInstance";
 import formatDate from "../../../utils/formatedDate";
@@ -93,24 +93,14 @@ const AdminFormProfile = () => {
             if (response.data && response.data.url) {
                 // Simpan URL gambar di photoLink
                 setPhotoLink(response.data.url);
-                message.success('Upload successful!');
-    
-                // Perbarui fileList dengan gambar yang baru diupload
-                const newFileList = [{
-                    uid: file.uid,
-                    name: file.name,
-                    status: 'done',
-                    url: response.data.url,
-                }];
-                setFileList(newFileList);
-                setPreviewImage(response.data.url); // Setel pratinjau ke URL baru
+                notification.success({message:'Upload successful!'});
                 onSuccess(response.data);
             } else {
-                message.error('Upload failed!');
+                notification.error({message:'Upload failed!'});
                 onError('No URL in response');
             }
         } catch (error) {
-            message.error('Error uploading file');
+            notification.error({message:'Error uploading file'});
             onError(error);
         }
     };

@@ -4,7 +4,7 @@ import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { gender, position, field, available } from "../../../data";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, message, Upload } from 'antd';
+import { Image, message, notification, Upload } from 'antd';
 import axiosInstance from "../../../utils/axiosInstance";
 import formatDate from "../../../utils/formatedDate";
 import convertToISODate from "../../../utils/convertToISODate";
@@ -112,14 +112,14 @@ const KonsultanFormProfile = () => {
             if (response.data && response.data.url) {
                 // Simpan URL gambar di photoLink
                 setPhotoLink(response.data.url);
-                message.success('Upload successful!');
+                notification.success({message:'Upload successful!'});
                 onSuccess(response.data);
             } else {
-                message.error('Upload failed!');
+                notification.error({message:'Upload failed!'});
                 onError('No URL in response');
             }
         } catch (error) {
-            message.error('Error uploading file');
+            notification.error({message:'Error uploading file'});
             onError(error);
         }
     };

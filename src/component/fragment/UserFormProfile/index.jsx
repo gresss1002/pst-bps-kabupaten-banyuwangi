@@ -3,7 +3,7 @@ import { Button, Stack } from "@chakra-ui/react";
 import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, message, Upload } from 'antd';
+import { Image, message, notification, Upload } from 'antd';
 import { district, education, gender, work, subsdistrict } from "../../../data";
 import formatDate from "../../../utils/formatedDate";
 import axiosInstance from "../../../utils/axiosInstance";
@@ -113,14 +113,14 @@ const UserFormProfile = () => {
             if (response.data && response.data.url) {
                 // Simpan URL gambar di photoLink
                 setPhotoLink(response.data.url);
-                message.success('Upload successful!');
+                notification.success({message:'Upload successful!'});
                 onSuccess(response.data);
             } else {
-                message.error('Upload failed!');
+                notification.error({message:'Upload failed!'});
                 onError('No URL in response');
             }
         } catch (error) {
-            message.error('Error uploading file');
+            notification.error({message:'Error uploading file'});
             onError(error);
         }
     };
@@ -269,10 +269,6 @@ const UserFormProfile = () => {
 
 
     useEffect(() => {
-        console.log('Districts:', districts);
-        console.log('Subsdistricts:', subsdistricts);
-        console.log('Subsdistricts Filtered:', subsdistrictsFiltered);
-
         const selectedDistrict = district.find(d => d.value === districts);
         if (selectedDistrict) {
             const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
@@ -280,9 +276,8 @@ const UserFormProfile = () => {
         } else {
             setSubsdistrictsFiltered([]);
         }
-        // Optionally reset subsdistricts if needed
-        // setSubsdistricts("");
     }, [districts]);
+    
 
     return (
         <div className="flex min-h-screen my-4 mx-2">
@@ -373,7 +368,7 @@ const UserFormProfile = () => {
                         />
 
                         <Select
-                            label="Asal Kecamatan"
+                            label="Asal Provinsi"
                             className="w-full"
                             variant="bordered"
                             isInvalid={districtsStatus === "danger"}
@@ -391,7 +386,7 @@ const UserFormProfile = () => {
                         </Select>
 
                         <Select
-                            label="Asal Desa"
+                            label="Asal Kabupaten/Kota"
                             className="w-full"
                             variant="bordered"
                             selectedKeys={[subsdistricts]}
