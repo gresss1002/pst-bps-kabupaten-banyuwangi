@@ -219,6 +219,10 @@ const UserFormProfile = () => {
         setDistricts(value);
     };
 
+    const handleSubsdistrictsChange = (value) => {
+        setSubsdistricts(value);
+    };
+
     const handleSubsdistrictsClick = () => {
         setSubsdistrictsTouched(true); // Track interaction with Subsdistricts dropdown
     };
@@ -399,7 +403,7 @@ const UserFormProfile = () => {
                             color={subsdistrictsStatus}
                             errorMessage={subsdistrictsStatus === "danger" ? "Pilih Kecamatan telebih dahulu" : ""}
                             // onChange={(value) => setSubsdistricts(value)}
-                            onChange={(e) => setSubsdistricts(e.target.value)}
+                            onChange={(e) => handleSubsdistrictsChange(e.target.value)}
                             onClick={handleSubsdistrictsClick}
                             // value={subsdistricts}
                             isRequired
