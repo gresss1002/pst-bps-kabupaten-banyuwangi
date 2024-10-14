@@ -50,8 +50,8 @@ const UserFormProfile = () => {
     const [email, setEmail] = useState('');
     const [genders, setGender] = useState('');
     const [districts, setDistricts] = useState('');
-    const [subsdistricts, setSubsdistricts] = useState('');
-    const [subsdistrictsFiltered, setSubsdistrictsFiltered] = useState([]);
+    // const [subsdistricts, setSubsdistricts] = useState('');
+    // const [subsdistricts, setSubsdistricts] = useState([]);
     const [works, setWork] = useState('');
     const [educations, setPendidikan] = useState('');
     const [birthDate, setBirthDate] = useState(null);
@@ -207,9 +207,9 @@ const UserFormProfile = () => {
         const selectedDistrict = district.find(d => d.value === districts);
         if (selectedDistrict) {
             const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
-            setSubsdistrictsFiltered(filtered);
+            setSubsdistricts(filtered);
         } else {
-            setSubsdistrictsFiltered([]);
+            setSubsdistricts([]);
         }
         setSubsdistricts("");
     }, [districts]);
@@ -272,9 +272,9 @@ const UserFormProfile = () => {
         const selectedDistrict = district.find(d => d.value === districts);
         if (selectedDistrict) {
             const filtered = subsdistrict.filter(sub => sub.districtId === selectedDistrict.districtId);
-            setSubsdistrictsFiltered(filtered);
+            setSubsdistricts(filtered);
         } else {
-            setSubsdistrictsFiltered([]);
+            setSubsdistricts([]);
         }
     }, [districts]);
     
@@ -379,7 +379,7 @@ const UserFormProfile = () => {
                             isRequired
                         >
                             {district.map((p) => (
-                                <SelectItem key={p.districtId} value={p.value}>
+                                <SelectItem key={p.value} value={p.value}>
                                     {p.value}
                                 </SelectItem>
                             ))}
@@ -399,7 +399,7 @@ const UserFormProfile = () => {
                             // value={subsdistricts}
                             isRequired
                         >
-                            {subsdistrictsFiltered.map((sd) => (
+                            {subsdistricts.map((sd) => (
                                 <SelectItem key={sd.id} value={sd.value}>
                                     {sd.value}
                                 </SelectItem>
