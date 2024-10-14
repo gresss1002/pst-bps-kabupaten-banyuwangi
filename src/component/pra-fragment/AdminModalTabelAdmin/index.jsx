@@ -88,7 +88,6 @@ const AdminModalTabelAdmin = ({ users }) => {
   // const districtsStatus = useMemo(() => (districtsValue === "" ? "nonActive" : "success"), [districtsValue]);
   // const subsdistrictsStatus = useMemo(() => (subsdistrictsValue === "" ? "nonActive" : "success"), [subsdistrictsValue]);
   // const workStatus = useMemo(() => (workValue === "" ? "nonActive" : "success"), [workValue]);
-  // const educationStatus = useMemo(() => (educationValue === "" ? "nonActive" : "success"), [educationValue]);
   const telephonesStatus = useMemo(() => (telephonesValue === "" || telephonesValue.length < 10 ? "nonActive" : "success"), [telephonesValue]);
   
   const isButtonDisabled = useMemo(() => {
