@@ -165,6 +165,7 @@ export const available = [
     { label: "Jumat", value: "Jumat" },
 ];
 
+
 export const district = [
     { districtId: "32", value: "Jawa Barat", label: "Jawa Barat" },
     { districtId: "33", value: "Jawa Tengah", label: "Jawa Tengah" },
@@ -239,6 +240,7 @@ export const subdistrict = [
     { id: "51", value: "Lebak", label: "Lebak", districtId: "36" },
     { id: "52", value: "Pandeglang", label: "Pandeglang", districtId: "36" }
 ];
+
 
 export const user = [
     {
