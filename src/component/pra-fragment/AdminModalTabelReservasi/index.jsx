@@ -354,15 +354,7 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     color={linkStatus}
                     isRequired
                 />
-                <Rate
-                    allowHalf
-                    value={rateValue}
-                    onChange={setRateValue}
-                    className="flex justify-center items-center w-full"
-                    disabled
-                />
-            </div>
-            <Textarea
+                <Textarea
                 label="Deskripsi Topik"
                 variant="bordered"
                 disableAnimation
@@ -375,6 +367,15 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                 color={descriptionStatus}
                 isReadOnly
             />
+                <Rate
+                    allowHalf
+                    value={rateValue}
+                    onChange={setRateValue}
+                    className="flex justify-center items-center w-full"
+                    disabled
+                />
+            </div>
+            
             <Button
                 variant='ghost'
                 colorScheme='bluePrimary'
