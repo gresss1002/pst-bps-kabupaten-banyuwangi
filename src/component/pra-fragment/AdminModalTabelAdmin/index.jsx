@@ -101,9 +101,6 @@ const AdminModalTabelAdmin = ({ users }) => {
       emailStatus === "danger" ||
       genderStatus === "danger" ||
       telephonesStatus === "danger" 
-      // positionStatus === "danger" ||
-      // fieldStatus === "danger" ||
-      // availableStatus === "danger"
     );
   }, [roleStatus,nameStatus,emailStatus,genderStatus,telephonesStatus]);
 
