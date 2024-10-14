@@ -141,33 +141,6 @@ const AdminModalTabelAdmin = ({ users }) => {
           color={genderStatus}
           isRequired
         />
-        {/* <Input
-          label="Jabatan"
-          variant="bordered"
-          className="w-full"
-          value={positionValue}
-          onChange={handleInputChange(setPositionValue)}
-          color={positionStatus}
-          isRequired
-        />
-        <Input
-          label="Bidang"
-          variant="bordered"
-          className="w-full"
-          value={fieldValue}
-          onChange={handleInputChange(setFieldValue)}
-          color={fieldStatus}
-          isRequired
-        />
-        <Input
-          label="Ketersediaan Hari"
-          variant="bordered"
-          className="w-full"
-          value={availableValue}
-          onChange={handleInputChange(setAvailableValue)}
-          color={availableStatus}
-          isRequired
-        /> */}
         <Input
           label="Telepon"
           variant="bordered"
