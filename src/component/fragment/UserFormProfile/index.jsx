@@ -399,7 +399,7 @@ const UserFormProfile = () => {
                             // value={subsdistricts}
                             isRequired
                         >
-                            {subsdistricts.map((sd) => (
+                            {subsdistrict.map((sd) => (
                                 <SelectItem key={sd.id} value={sd.value}>
                                     {sd.value}
                                 </SelectItem>
