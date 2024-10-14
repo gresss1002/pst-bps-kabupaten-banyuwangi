@@ -240,7 +240,6 @@ export const subdistrict = [
     { id: "52", value: "Pandeglang", label: "Pandeglang", districtId: "36" }
 ];
 
-
 export const user = [
     {
         email: "johndoe@example.com",
