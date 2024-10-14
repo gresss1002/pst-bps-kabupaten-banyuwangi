@@ -4,7 +4,7 @@ import { DatePicker, Input, Select, SelectItem } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { gender, position, field, available } from "../../../data";
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, message, notification, Upload } from 'antd';
+import { Image,notification, Upload } from 'antd';
 import axiosInstance from "../../../utils/axiosInstance";
 import formatDate from "../../../utils/formatedDate";
 import convertToISODate from "../../../utils/convertToISODate";
