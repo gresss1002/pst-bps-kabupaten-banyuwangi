@@ -379,7 +379,7 @@ const UserFormProfile = () => {
                             isRequired
                         >
                             {district.map((p) => (
-                                <SelectItem key={p.value} value={p.value}>
+                                <SelectItem key={p.districtId} value={p.value}>
                                     {p.value}
                                 </SelectItem>
                             ))}
@@ -400,7 +400,7 @@ const UserFormProfile = () => {
                             isRequired
                         >
                             {subsdistrictsFiltered.map((sd) => (
-                                <SelectItem key={sd.value} value={sd.value}>
+                                <SelectItem key={sd.id} value={sd.value}>
                                     {sd.value}
                                 </SelectItem>
                             ))}
