@@ -46,9 +46,6 @@ const KonsultanFormProfile = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [genders, setGender] = useState('');
-    // const [provinsi, setProvinsi] = useState('');
-    // const [kabupaten, setKabupaten] = useState('');
-    // const [kabupatenFiltered, setKabupatenFiltered] = useState([]);
     const [positions, setPosition] = useState('');
     const [fields, setField] = useState([]); // Ganti dari 'new Set([])' menjadi array kosong
     const [availables, setAvailable] = useState([]); // Menggunakan 'new Set([])' untuk inisialisasi state 'availables'
@@ -58,9 +55,6 @@ const KonsultanFormProfile = () => {
     const [messages, setMessages] = useState('');
     const [messagesType, setMessagesType] = useState('');
 
-    // const [kabupatenTouched, setKabupatenTouched] = useState(false);
-    // const [image, setImage] = useState(null); // State untuk menyimpan file gambar
-    // const [imageStatus, setImageStatus] = useState('nonActive'); // Status upload gambar
 
 
     useEffect(() => {
