@@ -175,7 +175,7 @@ export const district = [
     { districtId: "36", value: "Banten", label: "Banten" }
 ];
 
-export const subdistrict = [
+export const subsdistrict = [
     // Jawa Barat
     { id: "1", value: "Bandung", label: "Bandung", districtId: "32" },
     { id: "2", value: "Bekasi", label: "Bekasi", districtId: "32" },
