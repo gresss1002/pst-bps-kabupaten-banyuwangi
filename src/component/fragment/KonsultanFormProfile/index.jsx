@@ -66,9 +66,6 @@ const KonsultanFormProfile = () => {
             setField(userData?.field || []);
             setAvailable(userData?.available || []);
             setDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
-            // setWork(userData?.work || '');
-            // setPendidikan(userData?.education || '');
-            // setBirthDate(userData?.birthDate ? parseDate(convertToISODate(userData.birthDate)) : null);
             setTelepon(userData?.telephone || '');
             setPhotoLink(userData?.photoLink || '');
             setFileList(userData?.photoLink ? [{
