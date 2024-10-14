@@ -90,10 +90,7 @@ const AdminModalTabelAdmin = ({ users }) => {
   // const workStatus = useMemo(() => (workValue === "" ? "nonActive" : "success"), [workValue]);
   // const educationStatus = useMemo(() => (educationValue === "" ? "nonActive" : "success"), [educationValue]);
   const telephonesStatus = useMemo(() => (telephonesValue === "" || telephonesValue.length < 10 ? "nonActive" : "success"), [telephonesValue]);
-  // const positionStatus = useMemo(() => (positionValue === "" ? "nonActive" : "success"), [positionValue]);
-  // const fieldStatus = useMemo(() => (fieldValue === "" ? "nonActive" : "success"), [fieldValue]);
-  // const availableStatus = useMemo(() => (availableValue === "" ? "nonActive" : "success"), [availableValue]);
-
+  
   const isButtonDisabled = useMemo(() => {
     return (
       roleStatus === "danger" ||
