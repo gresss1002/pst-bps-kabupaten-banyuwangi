@@ -167,7 +167,6 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
             user: userValue,
             link: linkValue,
             descriptionReservasi: descriptionValue,
-            rating: rateValue,
             status: currentStatus,
             gender: genderValue,
             konsultan: selectedKonsultan
@@ -252,7 +251,7 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
             linkStatus === "danger"
         );
 
-    }, [methodStatus, topicStatus, reservasiDateStatus, timeStatus, userStatus, genderStatus, linkStatus, currentStatus, isRatingDisabled, descriptionStatus]);
+    }, [methodStatus, topicStatus, reservasiDateStatus, timeStatus, userStatus, descriptionStatus, genderStatus, linkStatus, isRatingDisabled]);
 
     return (
         <div className="flex flex-col gap-4 justify-center items-center w-full" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "14px" }}>
@@ -359,7 +358,7 @@ const AdminModalTabelReservasi = ({ reservasi }) => {
                     value={rateValue}
                     onChange={setRateValue}
                     className="flex justify-center items-center w-full"
-                    disabled={isRatingDisabled}
+                    disabled
                 />
             </div>
             <Textarea
